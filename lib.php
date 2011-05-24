@@ -19,7 +19,7 @@
  * Mandatory public API of url module
  *
  * @package    mod
- * @subpackage url
+ * @subpackage webctimport
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die;
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know
  */
-function url_supports($feature) {
+function webctimport_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
         case FEATURE_GROUPS:                  return false;
@@ -51,7 +51,7 @@ function url_supports($feature) {
  * Returns all other caps used in module
  * @return array
  */
-function url_get_extra_capabilities() {
+function webctimport_get_extra_capabilities() {
     return array('moodle/site:accessallgroups');
 }
 
@@ -60,7 +60,7 @@ function url_get_extra_capabilities() {
  * @param $data the data submitted from the reset course.
  * @return array status array
  */
-function url_reset_userdata($data) {
+function webctimport_reset_userdata($data) {
     return array();
 }
 
@@ -68,7 +68,7 @@ function url_reset_userdata($data) {
  * List of view style log actions
  * @return array
  */
-function url_get_view_actions() {
+function webctimport_get_view_actions() {
     return array('view', 'view all');
 }
 
@@ -76,7 +76,7 @@ function url_get_view_actions() {
  * List of update style log actions
  * @return array
  */
-function url_get_post_actions() {
+function webctimport_get_post_actions() {
     return array('update', 'add');
 }
 
@@ -86,7 +86,7 @@ function url_get_post_actions() {
  * @param object $mform
  * @return int new url instance id
  */
-function url_add_instance($data, $mform) {
+function webctimport_add_instance($data, $mform) {
     global $DB;
 
     $parameters = array();
@@ -116,18 +116,18 @@ function url_add_instance($data, $mform) {
     }
 
     $data->timemodified = time();
-    $data->id = $DB->insert_record('url', $data);
+    $data->id = $DB->insert_record('webctimport', $data);
 
     return $data->id;
 }
 
 /**
- * Update url instance.
+ * Update webctimport instance.
  * @param object $data
  * @param object $mform
  * @return bool true
  */
-function url_update_instance($data, $mform) {
+function webctimport_update_instance($data, $mform) {
     global $CFG, $DB;
 
     $parameters = array();
@@ -159,7 +159,7 @@ function url_update_instance($data, $mform) {
     $data->timemodified = time();
     $data->id           = $data->instance;
 
-    $DB->update_record('url', $data);
+    $DB->update_record('webctimport', $data);
 
     return true;
 }
@@ -169,16 +169,16 @@ function url_update_instance($data, $mform) {
  * @param int $id
  * @return bool true
  */
-function url_delete_instance($id) {
+function webctimport_delete_instance($id) {
     global $DB;
 
-    if (!$url = $DB->get_record('url', array('id'=>$id))) {
+    if (!$url = $DB->get_record('webctimport', array('id'=>$id))) {
         return false;
     }
 
     // note: all context files are deleted automatically
 
-    $DB->delete_records('url', array('id'=>$url->id));
+    $DB->delete_records('webctimport', array('id'=>$url->id));
 
     return true;
 }
@@ -191,10 +191,10 @@ function url_delete_instance($id) {
  * @param object $url
  * @return object|null
  */
-function url_user_outline($course, $user, $mod, $url) {
+function webctimport_user_outline($course, $user, $mod, $url) {
     global $DB;
 
-    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'url',
+    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'webctimport',
                                               'action'=>'view', 'info'=>$url->id), 'time ASC')) {
 
         $numviews = count($logs);
@@ -216,10 +216,10 @@ function url_user_outline($course, $user, $mod, $url) {
  * @param object $mod
  * @param object $url
  */
-function url_user_complete($course, $user, $mod, $url) {
+function webctimport_user_complete($course, $user, $mod, $url) {
     global $CFG, $DB;
 
-    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'url',
+    if ($logs = $DB->get_records('log', array('userid'=>$user->id, 'module'=>'webctimport',
                                               'action'=>'view', 'info'=>$url->id), 'time ASC')) {
         $numviews = count($logs);
         $lastlog = array_pop($logs);
@@ -230,7 +230,7 @@ function url_user_complete($course, $user, $mod, $url) {
         echo "$strnumviews - $strmostrecently ".userdate($lastlog->time);
 
     } else {
-        print_string('neverseen', 'url');
+        print_string('neverseen', 'webctimport');
     }
 }
 
@@ -240,7 +240,7 @@ function url_user_complete($course, $user, $mod, $url) {
  * @param int $urlid
  * @return bool false
  */
-function url_get_participants($urlid) {
+function webctimport_get_participants($urlid) {
     return false;
 }
 
@@ -254,11 +254,11 @@ function url_get_participants($urlid) {
  * @param object $coursemodule
  * @return object info
  */
-function url_get_coursemodule_info($coursemodule) {
+function webctimport_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
-    require_once("$CFG->dirroot/mod/url/locallib.php");
+    require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 
-    if (!$url = $DB->get_record('url', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, externalurl, parameters')) {
+    if (!$url = $DB->get_record('webctimport', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, externalurl, parameters')) {
         return NULL;
     }
 
@@ -268,10 +268,11 @@ function url_get_coursemodule_info($coursemodule) {
     //note: there should be a way to differentiate links from normal resources
     $info->icon = url_guess_icon($url->externalurl);
 
+    //??
     $display = url_get_final_display_type($url);
 
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
-        $fullurl = "$CFG->wwwroot/mod/url/view.php?id=$coursemodule->id&amp;redirect=1";
+        $fullurl = "$CFG->wwwroot/mod/webctimport/view.php?id=$coursemodule->id&amp;redirect=1";
         $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
         $width  = empty($options['popupwidth'])  ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
@@ -279,11 +280,11 @@ function url_get_coursemodule_info($coursemodule) {
         $info->extra = "onclick=\"window.open('$fullurl', '', '$wh'); return false;\"";
 
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
-        $fullurl = "$CFG->wwwroot/mod/url/view.php?id=$coursemodule->id&amp;redirect=1";
+        $fullurl = "$CFG->wwwroot/mod/webctimport/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->extra = "onclick=\"window.open('$fullurl'); return false;\"";
 
     } else if ($display == RESOURCELIB_DISPLAY_OPEN) {
-        $fullurl = "$CFG->wwwroot/mod/url/view.php?id=$coursemodule->id&amp;redirect=1";
+        $fullurl = "$CFG->wwwroot/mod/webctimport/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->extra = "onclick=\"window.location.href ='$fullurl';return false;\"";
     }
 
@@ -301,7 +302,7 @@ function url_get_coursemodule_info($coursemodule) {
  * @param stdClass $module The module object returned from the DB
  * @param stdClass $cm The course module instance returned from the DB
  */
-function url_extend_navigation($navigation, $course, $module, $cm) {
+function webctimport_extend_navigation($navigation, $course, $module, $cm) {
     /**
      * This is currently just a stub so that it can be easily expanded upon.
      * When expanding just remove this comment and the line below and then add

@@ -16,11 +16,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * List of urls in course
+ * List of webctimports in course
  *
  * @package    mod
- * @subpackage url
- * @copyright  2009 onwards Martin Dougiamas (http://dougiamas.com)
+ * @subpackage webctimport
+ * @copyright  2009 onwards Martin Dougiamas (http://dougiamas.com), 2011 The University of Nottingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ $course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
 require_course_login($course, true);
 $PAGE->set_pagelayout('incourse');
 
-add_to_log($course->id, 'url', 'view all', "index.php?id=$course->id", '');
+add_to_log($course->id, 'webctimport', 'view all', "index.php?id=$course->id", '');
 
 $strurl       = get_string('modulename', 'url');
 $strurls      = get_string('modulenameplural', 'url');
@@ -42,13 +42,13 @@ $strname         = get_string('name');
 $strintro        = get_string('moduleintro');
 $strlastmodified = get_string('lastmodified');
 
-$PAGE->set_url('/mod/url/index.php', array('id' => $course->id));
+$PAGE->set_url('/mod/webctimport/index.php', array('id' => $course->id));
 $PAGE->set_title($course->shortname.': '.$strurls);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($strurls);
 echo $OUTPUT->header();
 
-if (!$urls = get_all_instances_in_course('url', $course)) {
+if (!$urls = get_all_instances_in_course('webctimport', $course)) {
     notice(get_string('thereareno', 'moodle', $strurls), "$CFG->wwwroot/course/view.php?id=$course->id");
     exit;
 }

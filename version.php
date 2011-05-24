@@ -19,14 +19,14 @@
  * Folder module version information
  *
  * @package    mod
- * @subpackage url
+ * @subpackage webctimport
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$module->version  = 2010101400;
+$module->version  = 2011071101;
 $module->requires = 2010080300;  // Requires this Moodle version
 $module->cron     = 0;
 

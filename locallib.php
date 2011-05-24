@@ -16,10 +16,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Private url module utility functions
+ * Private webctimport module utility functions
  *
  * @package    mod
- * @subpackage url
+ * @subpackage webctimport
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,10 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/filelib.php");
 require_once("$CFG->libdir/resourcelib.php");
-require_once("$CFG->dirroot/mod/url/lib.php");
+require_once("$CFG->dirroot/mod/webctimport/lib.php");
+
+require_once("$CFG->dirroot/mod/url/locallib.php");
+
 
 /**
  * Return full url with all extra parameters
@@ -37,7 +40,7 @@ require_once("$CFG->dirroot/mod/url/lib.php");
  * @param object $course
  * @return string url
  */
-function url_get_full_url($url, $cm, $course, $config=null) {
+function webctimport_get_full_url($url, $cm, $course, $config=null) {
 
     $parameters = empty($url->parameters) ? array() : unserialize($url->parameters);
 
@@ -79,7 +82,7 @@ function url_get_full_url($url, $cm, $course, $config=null) {
  * @param object $course
  * @return void
  */
-function url_print_header($url, $cm, $course) {
+function webctimport_print_header($url, $cm, $course) {
     global $PAGE, $OUTPUT;
 
     $PAGE->set_title($course->shortname.': '.$url->name);
@@ -96,7 +99,7 @@ function url_print_header($url, $cm, $course) {
  * @param bool $ignoresettings print even if not specified in modedit
  * @return void
  */
-function url_print_heading($url, $cm, $course, $ignoresettings=false) {
+function webctimport_print_heading($url, $cm, $course, $ignoresettings=false) {
     global $OUTPUT;
 
     $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
@@ -114,7 +117,7 @@ function url_print_heading($url, $cm, $course, $ignoresettings=false) {
  * @param bool $ignoresettings print even if not specified in modedit
  * @return void
  */
-function url_print_intro($url, $cm, $course, $ignoresettings=false) {
+function webctimport_print_intro($url, $cm, $course, $ignoresettings=false) {
     global $OUTPUT;
 
     $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
@@ -134,7 +137,7 @@ function url_print_intro($url, $cm, $course, $ignoresettings=false) {
  * @param object $course
  * @return does not return
  */
-function url_display_frame($url, $cm, $course) {
+function webctimport_display_frame($url, $cm, $course) {
     global $PAGE, $OUTPUT, $CFG;
 
     $frame = optional_param('frameset', 'main', PARAM_ALPHA);
@@ -184,7 +187,7 @@ EOF;
  * @param object $course
  * @return does not return
  */
-function url_print_workaround($url, $cm, $course) {
+function webctimport_print_workaround($url, $cm, $course) {
     global $OUTPUT;
 
     url_print_header($url, $cm, $course);
@@ -224,7 +227,7 @@ function url_print_workaround($url, $cm, $course) {
  * @param stored_file $file main file
  * @return does not return
  */
-function url_display_embed($url, $cm, $course) {
+function webctimport_display_embed($url, $cm, $course) {
     global $CFG, $PAGE, $OUTPUT;
 
     $mimetype = resourcelib_guess_url_mimetype($url->externalurl);
@@ -272,12 +275,12 @@ function url_display_embed($url, $cm, $course) {
         $code = resourcelib_embed_general($fullurl, $title, $clicktoopen, $mimetype);
     }
 
-    url_print_header($url, $cm, $course);
-    url_print_heading($url, $cm, $course);
+    webctimport_print_header($url, $cm, $course);
+    webctimport_print_heading($url, $cm, $course);
 
     echo $code;
 
-    url_print_intro($url, $cm, $course);
+    webctimport_print_intro($url, $cm, $course);
 
     echo $OUTPUT->footer();
     die;
@@ -288,7 +291,7 @@ function url_display_embed($url, $cm, $course) {
  * @param object $url
  * @return int display type constant
  */
-function url_get_final_display_type($url) {
+function webctimport_get_final_display_type($url) {
     global $CFG;
 
     if ($url->display != RESOURCELIB_DISPLAY_AUTO) {
@@ -324,181 +327,3 @@ function url_get_final_display_type($url) {
     return RESOURCELIB_DISPLAY_OPEN;
 }
 
-/**
- * Get the parameters that may be appended to URL
- * @param object $config url module config options
- * @return array array describing opt groups
- */
-function url_get_variable_options($config) {
-    global $CFG;
-
-    $options = array();
-    $options[''] = array('' => get_string('chooseavariable', 'url'));
-
-    $options[get_string('course')] = array(
-        'courseid'        => 'id',
-        'coursefullname'  => get_string('fullnamecourse'),
-        'courseshortname' => get_string('shortnamecourse'),
-        'courseidnumber'  => get_string('idnumbercourse'),
-        'coursesummary'   => get_string('summary'),
-        'courseformat'    => get_string('format'),
-    );
-
-    $options[get_string('modulename', 'url')] = array(
-        'urlinstance'     => 'id',
-        'urlcmid'         => 'cmid',
-        'urlname'         => get_string('name'),
-        'urlidnumber'     => get_string('idnumbermod'),
-    );
-
-    $options[get_string('miscellaneous')] = array(
-        'sitename'        => get_string('fullsitename'),
-        'serverurl'       => get_string('serverurl', 'url'),
-        'currenttime'     => get_string('time'),
-        'lang'            => get_string('language'),
-    );
-    if (!empty($config->secretphrase)) {
-        $options[get_string('miscellaneous')]['encryptedcode'] = get_string('encryptedcode');
-    }
-
-    $options[get_string('user')] = array(
-        'userid'          => 'id',
-        'userusername'    => get_string('username'),
-        'useridnumber'    => get_string('idnumber'),
-        'userfirstname'   => get_string('firstname'),
-        'userlastname'    => get_string('lastname'),
-        'userfullname'    => get_string('fullnameuser'),
-        'useremail'       => get_string('email'),
-        'usericq'         => get_string('icqnumber'),
-        'userphone1'      => get_string('phone').' 1',
-        'userphone2'      => get_string('phone2').' 2',
-        'userinstitution' => get_string('institution'),
-        'userdepartment'  => get_string('department'),
-        'useraddress'     => get_string('address'),
-        'usercity'        => get_string('city'),
-        'usertimezone'    => get_string('timezone'),
-        'userurl'         => get_string('webpage'),
-    );
-
-    if ($config->rolesinparams) {
-        $roles = get_all_roles();
-        $roleoptions = array();
-        foreach ($roles as $role) {
-            $roleoptions['course'.$role->shortname] = get_string('yourwordforx', '', $role->name);
-        }
-        $options[get_string('roles')] = $roleoptions;
-    }
-
-    return $options;
-}
-
-/**
- * Get the parameter values that may be appended to URL
- * @param object $url module instance
- * @param object $cm
- * @param object $course
- * @param object $config module config options
- * @return array of parameter values
- */
-function url_get_variable_values($url, $cm, $course, $config) {
-    global $USER, $CFG;
-
-    $site = get_site();
-
-    $values = array (
-        'courseid'        => $course->id,
-        'coursefullname'  => format_string($course->fullname),
-        'courseshortname' => $course->shortname,
-        'courseidnumber'  => $course->idnumber,
-        'coursesummary'   => $course->summary,
-        'courseformat'    => $course->format,
-        'lang'            => current_language(),
-        'sitename'        => format_string($site->fullname),
-        'serverurl'       => $CFG->wwwroot,
-        'currenttime'     => time(),
-        'urlinstance'     => $url->id,
-        'urlcmid'         => $cm->id,
-        'urlname'         => format_string($url->name),
-        'urlidnumber'     => $cm->idnumber,
-    );
-
-    if (isloggedin()) {
-        $values['userid']          = $USER->id;
-        $values['userusername']    = $USER->username;
-        $values['useridnumber']    = $USER->idnumber;
-        $values['userfirstname']   = $USER->firstname;
-        $values['userlastname']    = $USER->lastname;
-        $values['userfullname']    = fullname($USER);
-        $values['useremail']       = $USER->email;
-        $values['usericq']         = $USER->icq;
-        $values['userphone1']      = $USER->phone1;
-        $values['userphone2']      = $USER->phone2;
-        $values['userinstitution'] = $USER->institution;
-        $values['userdepartment']  = $USER->department;
-        $values['useraddress']     = $USER->address;
-        $values['usercity']        = $USER->city;
-        $values['usertimezone']    = get_user_timezone_offset();
-        $values['userurl']         = $USER->url;
-    }
-
-    // weak imitation of Single-Sign-On, for backwards compatibility only
-    // NOTE: login hack is not included in 2.0 any more, new contrib auth plugin
-    //       needs to be createed if somebody needs the old functionality!
-    if (!empty($config->secretphrase)) {
-        $values['encryptedcode'] = url_get_encrypted_parameter($url, $config);
-    }
-
-    //hmm, this is pretty fragile and slow, why do we need it here??
-    if ($config->rolesinparams) {
-        $roles = get_all_roles();
-        $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
-        $roles = role_fix_names($roles, $coursecontext, ROLENAME_ALIAS);
-        foreach ($roles as $role) {
-            $values['course'.$role->shortname] = $role->localname;
-        }
-    }
-
-    return $values;
-}
-
-/**
- * BC internal function
- * @param object $url
- * @param object $config
- * @return string
- */
-function url_get_encrypted_parameter($url, $config) {
-    global $CFG;
-
-    if (file_exists("$CFG->dirroot/local/externserverfile.php")) {
-        require_once("$CFG->dirroot/local/externserverfile.php");
-        if (function_exists('extern_server_file')) {
-            return extern_server_file($url, $config);
-        }
-    }
-    return md5(getremoteaddr().$config->secretphrase);
-}
-
-/**
- * Optimised mimetype detection from general URL
- * @param $fullurl
- * @return string mimetype
- */
-function url_guess_icon($fullurl) {
-    global $CFG;
-    require_once("$CFG->libdir/filelib.php");
-
-    if (substr_count($fullurl, '/') < 3 or substr($fullurl, -1) === '/') {
-        // most probably default directory - index.php, index.html, etc.
-        return 'f/web';
-    }
-
-    $icon = mimeinfo('icon', $fullurl);
-    $icon = 'f/'.str_replace(array('.gif', '.png'), '', $icon);
-
-    if ($icon === 'f/html' or $icon === 'f/unknown') {
-        $icon = 'f/web';
-    }
-
-    return $icon;
-}

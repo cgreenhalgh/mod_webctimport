@@ -19,7 +19,7 @@
  * URL configuration form
  *
  * @package    mod
- * @subpackage url
+ * @subpackage webctimport
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +27,14 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/url/locallib.php');
+require_once($CFG->dirroot.'/mod/webctimport/locallib.php');
 
 class mod_url_mod_form extends moodleform_mod {
     function definition() {
         global $CFG, $DB;
         $mform = $this->_form;
 
-        $config = get_config('url');
+        $config = get_config('webctimport');
 
         //-------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));

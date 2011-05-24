@@ -23,18 +23,18 @@
  */
 
 /**
- * Define all the restore steps that will be used by the restore_url_activity_task
+ * Define all the restore steps that will be used by the restore_webctimport_activity_task
  */
 
 /**
- * Structure step to restore one url activity
+ * Structure step to restore one webctimport activity
  */
-class restore_url_activity_structure_step extends restore_activity_structure_step {
+class restore_webctimport_activity_structure_step extends restore_activity_structure_step {
 
     protected function define_structure() {
 
         $paths = array();
-        $paths[] = new restore_path_element('url', '/activity/url');
+        $paths[] = new restore_path_element('webctimport', '/activity/webctimport');
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
@@ -48,13 +48,13 @@ class restore_url_activity_structure_step extends restore_activity_structure_ste
         $data->course = $this->get_courseid();
 
         // insert the url record
-        $newitemid = $DB->insert_record('url', $data);
+        $newitemid = $DB->insert_record('webctimport', $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
     protected function after_execute() {
         // Add url related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_url', 'intro', null);
+        $this->add_related_files('mod_webctimport', 'intro', null);
     }
 }

@@ -1,4 +1,4 @@
-This file is part of Moodle - http://moodle.org/
+This file is based on the URL module from Moodle - http://moodle.org/
 
 Moodle is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,16 +13,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-copyright 2009 Petr Skoda (http://skodak.org)
+copyright 2009 Petr Skoda (http://skodak.org), 2011 The University of Nottingham (Chris Greenhalgh)
 license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
 
-URL module
-=============
+WebCTImport module
+==================
 
-URL module is one of the successors to original 'file' type plugin of Resource module.
+This module is based on a clone of the MOODLE_20_STABLE URL module and provides an interface
+to import files from a custom dump of the WebCT database, for the University of Nottingham.
 
+The WebCT Database export code is in https://github.com/cgreenhalgh/webctdbexport
+It consists of a folder/file hierarchy on disk which mirrors the JSON-encoded information 
+used by the Moodle Repository API, i.e. a list of Files/sub-Folders.
 
-TODO:
- * implement portfolio support (MDL-20084)
- * new backup/restore and old restore transformation (MDL-20085)
+This modules is intended to:
+
+- provide a user interaction entry point to allow a user to start adding files/folders/links
+  from the webct dump
+
+- add moodle URL items for each link, label items for each folder, and webctimport items for each
+  file.
+
+- each webctimport item represents the need to import an actual file, and can be processed in 
+  the background. For UoN the plan is to move the file into Equella and replace the webctimport
+  item with an equella item. Alternatively it could be loaded into Moodle and replaced with a
+  File item.
+
+Chris Greenhalgh, 2011-07-11
+  
+TO DO
+=====
+
+- implement it all...
+

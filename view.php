@@ -19,13 +19,13 @@
  * URL module main user interface
  *
  * @package    mod
- * @subpackage url
+ * @subpackage webctimport
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');
-require_once("$CFG->dirroot/mod/url/locallib.php");
+require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 require_once($CFG->libdir . '/completionlib.php');
 
 $id       = optional_param('id', 0, PARAM_INT);        // Course module ID
@@ -33,27 +33,27 @@ $u        = optional_param('u', 0, PARAM_INT);         // URL instance id
 $redirect = optional_param('redirect', 0, PARAM_BOOL);
 
 if ($u) {  // Two ways to specify the module
-    $url = $DB->get_record('url', array('id'=>$u), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('url', $url->id, $url->course, false, MUST_EXIST);
+    $url = $DB->get_record('webctimport', array('id'=>$u), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('webctimport', $url->id, $url->course, false, MUST_EXIST);
 
 } else {
-    $cm = get_coursemodule_from_id('url', $id, 0, false, MUST_EXIST);
-    $url = $DB->get_record('url', array('id'=>$cm->instance), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_id('webctimport', $id, 0, false, MUST_EXIST);
+    $url = $DB->get_record('webctimport', array('id'=>$cm->instance), '*', MUST_EXIST);
 }
 
 $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
 
 require_course_login($course, true, $cm);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-require_capability('mod/url:view', $context);
+require_capability('mod/webctimport:view', $context);
 
-add_to_log($course->id, 'url', 'view', 'view.php?id='.$cm->id, $url->id, $cm->id);
+add_to_log($course->id, 'webctimport', 'view', 'view.php?id='.$cm->id, $url->id, $cm->id);
 
 // Update 'viewed' state if required by completion system
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-$PAGE->set_url('/mod/url/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/webctimport/view.php', array('id' => $cm->id));
 
 if ($redirect) {
     // coming from course page or url index page,
@@ -62,7 +62,7 @@ if ($redirect) {
     redirect(str_replace('&amp;', '&', $fullurl));
 }
 
-switch (url_get_final_display_type($url)) {
+switch (webctimport_get_final_display_type($url)) {
     case RESOURCELIB_DISPLAY_EMBED:
         url_display_embed($url, $cm, $course);
         break;

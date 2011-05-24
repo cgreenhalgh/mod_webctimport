@@ -24,13 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/url/backup/moodle2/restore_url_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/webctimport/backup/moodle2/restore_webctimport_stepslib.php'); // Because it exists (must)
 
 /**
- * url restore task that provides all the settings and steps to perform one
+ * webctimport restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
-class restore_url_activity_task extends restore_activity_task {
+class restore_webctimport_activity_task extends restore_activity_task {
 
     /**
      * Define (add) particular settings this activity can have
@@ -44,7 +44,7 @@ class restore_url_activity_task extends restore_activity_task {
      */
     protected function define_my_steps() {
         // url only has one structure step
-        $this->add_step(new restore_url_activity_structure_step('url_structure', 'url.xml'));
+        $this->add_step(new restore_webctimport_activity_structure_step('webctimport_structure', 'webctimport.xml'));
     }
 
     /**
@@ -54,7 +54,7 @@ class restore_url_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        $contents[] = new restore_decode_content('url', array('intro'), 'url');
+        $contents[] = new restore_decode_content('webctimport', array('intro'), 'webctimport');
 
         return $contents;
     }
@@ -66,9 +66,9 @@ class restore_url_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        $rules[] = new restore_decode_rule('URLINDEX', '/mod/url/index.php?id=$1', 'course');
-        $rules[] = new restore_decode_rule('URLVIEWBYID', '/mod/url/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('URLVIEWBYU', '/mod/url/view.php?u=$1', 'url');
+        $rules[] = new restore_decode_rule('URLINDEX', '/mod/webctimport/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('URLVIEWBYID', '/mod/webctimport/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('URLVIEWBYU', '/mod/webctimport/view.php?u=$1', 'url');
 
         return $rules;
 
@@ -83,9 +83,9 @@ class restore_url_activity_task extends restore_activity_task {
     static public function define_restore_log_rules() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('url', 'add', 'view.php?id={course_module}', '{url}');
-        $rules[] = new restore_log_rule('url', 'update', 'view.php?id={course_module}', '{url}');
-        $rules[] = new restore_log_rule('url', 'view', 'view.php?id={course_module}', '{url}');
+        $rules[] = new restore_log_rule('webctimport', 'add', 'view.php?id={course_module}', '{url}');
+        $rules[] = new restore_log_rule('webctimport', 'update', 'view.php?id={course_module}', '{url}');
+        $rules[] = new restore_log_rule('webctimport', 'view', 'view.php?id={course_module}', '{url}');
 
         return $rules;
     }
@@ -103,7 +103,7 @@ class restore_url_activity_task extends restore_activity_task {
     static public function define_restore_log_rules_for_course() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('url', 'view all', 'index.php?id={course}', null);
+        $rules[] = new restore_log_rule('webctimport', 'view all', 'index.php?id={course}', null);
 
         return $rules;
     }

@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * URL module upgrade code
+ * webctimport module upgrade code
  *
  * This file keeps track of upgrades to
  * the resource module
@@ -46,7 +46,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_url_upgrade($oldversion) {
+function xmldb_webctimport_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();

@@ -24,31 +24,21 @@
  *   - partially defaults.php
  *
  * @package    mod
- * @subpackage url
- * @copyright  2009 Petr Skoda  {@link http://skodak.org}
+ * @subpackage webctimport
+ * @copyright  2009 Petr Skoda  {@link http://skodak.org}, 2011 The University of Nottingham
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-function xmldb_url_install() {
+function xmldb_webctimport_install() {
     global $CFG;
 
-    // migrate settings if present
-    if (!empty($CFG->resource_secretphrase)) {
-        set_config('secretphrase', $CFG->resource_secretphrase, 'url');
-    }
-    unset_config('resource_secretphrase');
-
     // Upgrade from old resource module type if needed
-    require_once("$CFG->dirroot/mod/url/db/upgradelib.php");
-    url_20_migrate();
 }
 
-function xmldb_url_install_recovery() {
+function xmldb_webctimport_install_recovery() {
     global $CFG;
 
     // Upgrade from old resource module type if needed
-    require_once("$CFG->dirroot/mod/url/db/upgradelib.php");
-    url_20_migrate();
 }
