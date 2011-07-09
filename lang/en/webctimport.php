@@ -19,12 +19,12 @@
  * Strings for component 'url', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package    mod
- * @subpackage url
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @subpackage webctimport
+ * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}, 2011 The University of Nottingham (Chris Greenhalgh)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['clicktoopen'] = 'Click {$a} link to open resource.';
+$string['clicktopreview'] = 'Click {$a} to preview file.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
 $string['configimporttype'] = 'Type of resource to create in Moodle for each file exported from WebCT';

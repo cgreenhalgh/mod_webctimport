@@ -102,9 +102,10 @@ function webctimport_print_workaround($url, $cm, $course) {
     webctimport_print_heading($url, $cm, $course, true);
     webctimport_print_intro($url, $cm, $course, true);
 
-//    echo '<div class="urlworkaround">';
-//    print_string('clicktoopen', 'url', "<a href=\"$fullurl\" $extra>$fullurl</a>");
-//    echo '</div>';
+    $previewurl = "read_file.php?path=".urlencode($url->localfilepath);
+    echo '<div class="urlworkaround">';
+    print_string('clicktopreview', 'webctimport', "<a href=\"$previewurl\" target=\"_blank\">Preview</a>");
+    echo '</div>';
 
     echo $OUTPUT->footer();
     die;

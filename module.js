@@ -48,25 +48,29 @@ build_tree: function(Y, node, responseText, index) {
 		while (iname.length < maxlen)
 			iname = '0'+iname;
 		var itemindex = index+'_'+iname;
+		var path = 'index='+itemindex;
+		var li = '';
+		var linkextra = ' target="_blank"';
 		if (item.path!=undefined) {
-			var path = 'index='+itemindex+'&type=l&path='+M.mod_webctimport.encode(item.path)+'&title='+M.mod_webctimport.encode(item.title);
-			if (item.description!=undefined)
-				path = path+'&description='+M.mod_webctimport.encode(item.description);
-			node.append('<li><input type="checkbox" name="'+path+'"> '+item.title+'</li>');
-			M.mod_webctimport.add_subtree(Y, node, item, itemindex);
+			path = path+'&type=l&path='+M.mod_webctimport.encode(item.path)+'&title='+M.mod_webctimport.encode(item.title);
 		}
 		else if (item.webcttype=='URL_TYPE/Default') {
-			// link
-			var path = 'index='+itemindex+'&type=u&url='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
-			if (item.description!=undefined)
-				path = path+'&description='+M.mod_webctimport.encode(item.description);
-			node.append('<li><input type="checkbox" name="'+path+'"> '+item.title+'</li>');
-		} else {
+			path = path+'&type=u&url='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
+			li = li+' <a href="'+item.source+'"'+linkextra+'>'+item.source+'</a>';
+		} 
+		else {
 			// file
-			var path = 'index='+itemindex+'&type=f&path='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
-			if (item.description!=undefined)
-				path = path+'&description='+M.mod_webctimport.encode(item.description);
-			node.append('<li><input type="checkbox" name="'+path+'"> '+item.title+'</li>');
+			path = path+'&type=f&path='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
+			li = li+' <a href="read_file.php?path='+encodeURIComponent(item.source)+'"'+linkextra+'>Preview file</a>';
+		}
+		if (item.description!=undefined && item.description.length>0) {
+			path = path+'&description='+M.mod_webctimport.encode(item.description);
+			li = li+'<br>'+item.description;
+		}
+		li = '<li><input type="checkbox" name="'+path+'"> '+item.title+li+'</li>';
+		node.append(li);
+		if (item.path!=undefined) {
+			M.mod_webctimport.add_subtree(Y, node, item, itemindex);
 		}
 	}
 },

@@ -37,6 +37,7 @@ require_once("../url/lib.php");
 
 $indexes = array();
 $items = array();
+$minindent = 100;
 
 foreach ($_POST as $key => $value) {
 	debugging('param '.$key.' = '.$value);
@@ -54,6 +55,9 @@ foreach ($_POST as $key => $value) {
 			$indexes[] = $index;
 			$items[$index] = $item;
 			//debugging('Received '.$index.': '.$item);
+			$indent = count(explode('_',$index));
+			if ($indent < $minindent)
+				$minindent = $indent;
 		}
 	}
 }
@@ -68,7 +72,7 @@ foreach ($indexes as $index) {
     $mod = new stdClass();
     $mod->course = $courseid;
     $mod->section = $sectionnumber;
-    $mod->indent = count(explode('_',$index));
+    $mod->indent = count(explode('_',$index))-$minindent;
 	$return = null;
 	if ($type=='l') {
 		// label = folder
