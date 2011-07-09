@@ -241,7 +241,7 @@ function webctimport_get_coursemodule_info($coursemodule) {
     $info->name = $url->name;
 
     //note: there should be a way to differentiate links from normal resources
-    $info->icon = webctimport_guess_icon($url->localfilepath);
+    //$info->icon = webctimport_guess_icon($url->localfilepath);
 
     //??
     $display = RESOURCELIB_DISPLAY_OPEN; //url_get_final_display_type($url);

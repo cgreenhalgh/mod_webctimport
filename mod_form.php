@@ -31,6 +31,8 @@ require_once($CFG->dirroot.'/mod/webctimport/locallib.php');
 
 class mod_webctimport_mod_form extends moodleform_mod {
 	var $form;
+	var $previewelement;
+	var $previewurl;
 	
 	function definition() {
         global $CFG, $DB;
@@ -51,6 +53,14 @@ class mod_webctimport_mod_form extends moodleform_mod {
 
         //-------------------------------------------------------
         $mform->addElement('header', 'content', get_string('contentheader', 'webctimport'));
+        $this->previewelement = $mform->addElement('static', 'previewlink', get_string('clicktopreview', 'webctimport', "(Preview)"));
+//        $mform->addElement('html', 
+//'<div id="checkstatus">Requires Javascript</div><script type="text/javascript">YUI().use("node", function(Y) { alert("hi!"); Y.one("#checkstatus").replace(Y.Node.create("<div>Checking...</div>")); });</script>');
+        // TODO - hmm, how do we preview here - the object isn't known at this point
+//        $mform->addElement('html', '<div class="urlworkaround">');
+//        $previewurl = webctimport_get_preview_url($webctimport);
+//    	$mform->addElement('html', get_string('clicktopreview', 'webctimport', "<a href=\"$previewurl\" target=\"_blank\">Preview</a>"));
+//		$mform->addElement('html', '</div>');
         //$mform->addElement('url', 'externalurl', get_string('externalurl', 'url'), array('size'=>'60'), array('usefilepicker'=>true));
         //-------------------------------------------------------
         $mform->addElement('header', 'optionssection', get_string('optionsheader', 'webctimport'));
@@ -136,9 +146,22 @@ class mod_webctimport_mod_form extends moodleform_mod {
     function set_data($data)
 	{
 		$this->form = $data;
+		if (isset($data->localfilepath))
+			$this->previewurl = "$CFG->wwwroot/mod/webctimport/read_file.php?path=".urlencode($data->localfilepath);
 		parent::set_data($data);
 	}
-    
+    /**
+     * override if you need to setup the form depending on current
+     * values. This method is called after definition(), data submission and set_data().
+     * All form setup that is dependent on form values should go in here.
+     */
+    function definition_after_data() {
+    	if ($this->previewurl)
+	    	$this->previewelement->setLabel(get_string('clicktopreview', 'webctimport', 
+		    	"<a href=\"$this->previewurl\" target=\"_blank\">Preview</a>"));
+    }
+
+	
     /** display special case - add doesn't really add a single item, it starts the tree browser! */
    	function display()
 	{

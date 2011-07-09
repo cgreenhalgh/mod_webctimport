@@ -88,6 +88,10 @@ function webctimport_print_intro($url, $cm, $course, $ignoresettings=false) {
     }
 }
 
+function webctimport_get_preview_url($url) {
+    $previewurl = "read_file.php?path=".urlencode($url->localfilepath);
+	return $previewurl;
+}
 /**
  * Print url info and link.
  * @param object $url
@@ -102,7 +106,7 @@ function webctimport_print_workaround($url, $cm, $course) {
     webctimport_print_heading($url, $cm, $course, true);
     webctimport_print_intro($url, $cm, $course, true);
 
-    $previewurl = "read_file.php?path=".urlencode($url->localfilepath);
+    $previewurl = webctimport_get_preview_url($url);
     echo '<div class="urlworkaround">';
     print_string('clicktopreview', 'webctimport', "<a href=\"$previewurl\" target=\"_blank\">Preview</a>");
     echo '</div>';
