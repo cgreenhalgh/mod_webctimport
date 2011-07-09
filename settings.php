@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Url module admin settings and defaults
+ * webctimport module admin settings and defaults
  *
  * @package    mod
  * @subpackage webctimport
@@ -28,7 +28,19 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     require_once("$CFG->libdir/resourcelib.php");
+	require_once("$CFG->dirroot/mod/webctimport/lib.php");
+    
+    $settings->add(new admin_setting_configdirectory('webctimport/rootfilepath',
+        get_string('rootfilepath', 'webctimport'), get_string('configrootfilepath', 'webctimport'), "/webctimport"));
 
+    $settings->add(new admin_setting_configselect('webctimport/importtype',
+        get_string('importtype', 'webctimport'), get_string('configimporttype', 'webctimport'), 
+        WEBCTIMPORT_FILE,
+        array(WEBCTIMPORT_NONE => get_string('importtypenone','webctimport'),
+        	WEBCTIMPORT_FILE => get_string('importtypefile','webctimport'),
+        	WEBCTIMPORT_EQUELLA => get_string('importtypeequella','webctimport'))
+        ));
+        
     $displayoptions = resourcelib_get_displayoptions(array(RESOURCELIB_DISPLAY_AUTO,
                                                            RESOURCELIB_DISPLAY_EMBED,
                                                            RESOURCELIB_DISPLAY_FRAME,
@@ -43,12 +55,12 @@ if ($ADMIN->fulltree) {
                                   );
 
     //--- general settings -----------------------------------------------------------------------------------
+    $settings->add(new admin_setting_heading('webctimportmodeditgeneral', get_string('modeditgeneral', 'webctimport'), get_string('configmodeditgeneral', 'webctimport')));
+                                  
     $settings->add(new admin_setting_configtext('webctimport/framesize',
         get_string('framesize', 'webctimport'), get_string('configframesize', 'webctimport'), 130, PARAM_INT));
     $settings->add(new admin_setting_configcheckbox('webctimport/requiremodintro',
         get_string('requiremodintro', 'admin'), get_string('configrequiremodintro', 'admin'), 1));
-    $settings->add(new admin_setting_configcheckbox('webctimport/rolesinparams',
-        get_string('rolesinparams', 'webctimport'), get_string('configrolesinparams', 'webctimport'), false));
     $settings->add(new admin_setting_configmultiselect('webctimport/displayoptions',
         get_string('displayoptions', 'webctimport'), get_string('configdisplayoptions', 'webctimport'),
         $defaultdisplayoptions, $displayoptions));
@@ -71,4 +83,5 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext_with_advanced('webctimport/popupheight',
         get_string('popupheight', 'webctimport'), get_string('popupheightexplain', 'webctimport'),
         array('value'=>450, 'adv'=>true), PARAM_INT, 7));
+
 }

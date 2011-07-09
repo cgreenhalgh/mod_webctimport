@@ -55,21 +55,4 @@ $completion->set_module_viewed($cm);
 
 $PAGE->set_url('/mod/webctimport/view.php', array('id' => $cm->id));
 
-if ($redirect) {
-    // coming from course page or url index page,
-    // the redirection is needed for completion tracking and logging
-    $fullurl = url_get_full_url($url, $cm, $course);
-    redirect(str_replace('&amp;', '&', $fullurl));
-}
-
-switch (webctimport_get_final_display_type($url)) {
-    case RESOURCELIB_DISPLAY_EMBED:
-        url_display_embed($url, $cm, $course);
-        break;
-    case RESOURCELIB_DISPLAY_FRAME:
-        url_display_frame($url, $cm, $course);
-        break;
-    default:
-        url_print_workaround($url, $cm, $course);
-        break;
-}
+webctimport_print_workaround($url, $cm, $course);

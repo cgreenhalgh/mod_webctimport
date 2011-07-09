@@ -26,6 +26,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/** import types */
+define('WEBCTIMPORT_NONE', 0);
+define('WEBCTIMPORT_FILE', 1);
+define('WEBCTIMPORT_EQUELLA', 2);
+
 /**
  * List of features supported in URL module
  * @param string $feature FEATURE_xx constant for requested feature
@@ -89,17 +94,6 @@ function webctimport_get_post_actions() {
 function webctimport_add_instance($data, $mform) {
     global $DB;
 
-    $parameters = array();
-    for ($i=0; $i < 100; $i++) {
-        $parameter = "parameter_$i";
-        $variable  = "variable_$i";
-        if (empty($data->$parameter) or empty($data->$variable)) {
-            continue;
-        }
-        $parameters[$data->$parameter] = $data->$variable;
-    }
-    $data->parameters = serialize($parameters);
-
     $displayoptions = array();
     if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
         $displayoptions['popupwidth']  = $data->popupwidth;
@@ -110,10 +104,6 @@ function webctimport_add_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
-
-    if (!empty($data->externalurl) && (strpos($data->externalurl, '://') === false) && (strpos($data->externalurl, '/', 0) === false)) {
-        $data->externalurl = 'http://'.$data->externalurl;
-    }
 
     $data->timemodified = time();
     $data->id = $DB->insert_record('webctimport', $data);
@@ -130,17 +120,6 @@ function webctimport_add_instance($data, $mform) {
 function webctimport_update_instance($data, $mform) {
     global $CFG, $DB;
 
-    $parameters = array();
-    for ($i=0; $i < 100; $i++) {
-        $parameter = "parameter_$i";
-        $variable  = "variable_$i";
-        if (empty($data->$parameter) or empty($data->$variable)) {
-            continue;
-        }
-        $parameters[$data->$parameter] = $data->$variable;
-    }
-    $data->parameters = serialize($parameters);
-
     $displayoptions = array();
     if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
         $displayoptions['popupwidth']  = $data->popupwidth;
@@ -151,10 +130,6 @@ function webctimport_update_instance($data, $mform) {
         $displayoptions['printintro']   = (int)!empty($data->printintro);
     }
     $data->displayoptions = serialize($displayoptions);
-
-    if (!empty($data->externalurl) && (strpos($data->externalurl, '://') === false) && (strpos($data->externalurl, '/', 0) === false)) {
-        $data->externalurl = 'http://'.$data->externalurl;
-    }
 
     $data->timemodified = time();
     $data->id           = $data->instance;
@@ -258,7 +233,7 @@ function webctimport_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
     require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 
-    if (!$url = $DB->get_record('webctimport', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, externalurl, parameters')) {
+    if (!$url = $DB->get_record('webctimport', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, localfilepath, error, webctfileid')) {
         return NULL;
     }
 
@@ -266,11 +241,11 @@ function webctimport_get_coursemodule_info($coursemodule) {
     $info->name = $url->name;
 
     //note: there should be a way to differentiate links from normal resources
-    $info->icon = url_guess_icon($url->externalurl);
+    $info->icon = webctimport_guess_icon($url->localfilepath);
 
     //??
-    $display = url_get_final_display_type($url);
-
+    $display = RESOURCELIB_DISPLAY_OPEN; //url_get_final_display_type($url);
+/*
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
         $fullurl = "$CFG->wwwroot/mod/webctimport/view.php?id=$coursemodule->id&amp;redirect=1";
         $options = empty($url->displayoptions) ? array() : unserialize($url->displayoptions);
@@ -287,7 +262,7 @@ function webctimport_get_coursemodule_info($coursemodule) {
         $fullurl = "$CFG->wwwroot/mod/webctimport/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->extra = "onclick=\"window.location.href ='$fullurl';return false;\"";
     }
-
+*/
     return $info;
 }
 

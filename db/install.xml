@@ -1,28 +1,49 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/url/db" VERSION="2011071101" COMMENT="XMLDB file for URL module"
+<?xml version="1.0" encoding="UTF-8" ?> 
+<XMLDB PATH="mod/webctimport/db" VERSION="20110708" COMMENT="XMLDB file for webctimport module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
->
-  <TABLES>
-    <TABLE NAME="webctimport" COMMENT="each record is one file to be imported from webct dump">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="course" NEXT="intro"/>
-        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="externalurl"/>
-        <FIELD NAME="externalurl" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="introformat" NEXT="display"/>
-        <FIELD NAME="display" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="externalurl" NEXT="displayoptions"/>
-        <FIELD NAME="displayoptions" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="display" NEXT="parameters"/>
-        <FIELD NAME="parameters" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="displayoptions" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="parameters"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
-      </INDEXES>
-    </TABLE>
-  </TABLES>
+> 
+  <TABLES> 
+    <TABLE NAME="webctimport" COMMENT="each record is one file to be imported from webct dump" NEXT="webctfile"> 
+      <FIELDS> 
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/> 
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/> 
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="course" NEXT="intro"/> 
+        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/> 
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="localfilepath"/> 
+        <FIELD NAME="localfilepath" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Local (on-disk) file path in webct export cache" PREVIOUS="introformat" NEXT="display"/> 
+        <FIELD NAME="display" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="localfilepath" NEXT="displayoptions"/> 
+        <FIELD NAME="displayoptions" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="display" NEXT="timemodified"/> 
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="displayoptions" NEXT="error"/> 
+        <FIELD NAME="error" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="error to report to user" PREVIOUS="timemodified" NEXT="webctfileid"/> 
+        <FIELD NAME="webctfileid" TYPE="int" LENGTH="16" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" COMMENT="CmsFileContent id from webct" PREVIOUS="error" NEXT="metadata"/> 
+        <FIELD NAME="metadata" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="JSON-encoded metadata for import to Equella etc" PREVIOUS="webctfileid" NEXT="owners"/> 
+        <FIELD NAME="owners" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Nominal access list from webct" PREVIOUS="metadata"/> 
+      </FIELDS> 
+      <KEYS> 
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/> 
+      </KEYS> 
+      <INDEXES> 
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/> 
+      </INDEXES> 
+    </TABLE> 
+    <TABLE NAME="webctfile" COMMENT="each row is one CmsFileContent from webct, that is/has been imported" PREVIOUS="webctimport"> 
+      <FIELDS> 
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="webctfileid"/> 
+        <FIELD NAME="webctfileid" TYPE="int" LENGTH="16" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" COMMENT="id from webct - note length" PREVIOUS="id" NEXT="status"/> 
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="webctfileid" NEXT="metadata"/> 
+        <FIELD NAME="metadata" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="JSON-encoded metadata" PREVIOUS="status" NEXT="owners"/> 
+        <FIELD NAME="owners" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="metadata" NEXT="equellainfo"/> 
+        <FIELD NAME="equellainfo" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="result of successful equella import" PREVIOUS="owners" NEXT="fileinfo"/> 
+        <FIELD NAME="fileinfo" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="result of successful file import" PREVIOUS="equellainfo" NEXT="workerid"/> 
+        <FIELD NAME="workerid" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="fileinfo" NEXT="workertimestamp"/> 
+        <FIELD NAME="workertimestamp" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="workerid" NEXT="localfilepath"/> 
+        <FIELD NAME="localfilepath" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="workertimestamp"/> 
+      </FIELDS> 
+      <KEYS> 
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="webctfileidkey"/> 
+        <KEY NAME="webctfileidkey" TYPE="unique" FIELDS="webctfileid" PREVIOUS="primary"/> 
+      </KEYS> 
+    </TABLE> 
+  </TABLES> 
 </XMLDB>
