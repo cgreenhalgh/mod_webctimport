@@ -111,6 +111,14 @@ function webctimport_print_workaround($url, $cm, $course) {
     print_string('clicktopreview', 'webctimport', "<a href=\"$previewurl\" target=\"_blank\">Preview</a>");
     echo '</div>';
 
+    if ($url->webctfileid!==null) {
+	    require_once("form/webctimport.php");
+    	$options = new stdClass();
+	    $options->value = $url->webctfileid;
+	    $options->webctimportId = $url->id;
+    	echo form_webctimport_render($options);
+    }
+    
     echo $OUTPUT->footer();
     die;
 }
@@ -139,3 +147,74 @@ function webctimport_guess_icon($fullurl) {
     return $icon;
 }
 
+/**
+ *  add a webctfile record for this webctimport record
+ * @param object $data webctimport record dataobject
+ * @return int id of new record */
+function webctimport_add_webctfile($data) {
+	global $USER, $DB;
+	$file = new stdClass();
+    $file->localfilepath = $data->localfilepath;
+    try {
+    	$fileinfo = webctimport_get_file_info($file->localfilepath);
+    	if (isset($fileinfo->webctpath))
+	    	$file->webctpath = $fileinfo->webctpath;
+	    else 
+			debugging('file.json did not have webctpath for '.$data->localfilepath);    	
+	    
+    }
+    catch (Exception $e) {
+		debugging('Could not get file.json for '.$data->localfilepath.' ('.$e->getMessage().')');    	
+    }
+    $file->status = WEBCTIMPORT_STATUS_NEW;
+    if (isset($data->owneruserid))
+	    $file->owneruserid = $data->owneruserid;
+	else
+		$file->owneruserid = $USER->id;
+   	
+	$file->id = $DB->insert_record('webctfile', $file);	
+
+   	return $file->id;	
+}
+
+
+/** get file.json info from given cache path */
+function webctimport_get_file_info($path) {
+	$config = get_config('webctimport');
+	$rootfolderpath = $config->rootfolderpath;
+
+	if (substr($rootfolderpath, -1)=='/') {
+		$rootfolderpath = substr($rootfolderpath, 0, strlen($rootfolderpath)-1);
+	}
+
+	if (strpos($path, '../')===0 || strpos($path, '/../')!==false) {
+		throw new Exception('cannot return path including ../: '.$path);
+	}
+
+	$path = $rootfolderpath.$path.'/file.json';
+
+	debugging('get_file '.$path);
+
+	$json = file_get_contents($path);
+	if ($json===FALSE) {
+		throw new Exception('cannot find requested file information: '.$path);
+	}
+	$info = json_decode($json);
+	
+	return $info;
+}
+function webctimport_get_file_content_path($path) {
+	$config = get_config('webctimport');
+	$rootfilepath = $config->rootfilepath;
+
+	if (substr($rootfilepath, -1)=='/') {
+	$rootfilepath = substr($rootfilepath, 0, strlen($rootfilepath)-1);
+	}
+
+	if (strpos($path, '../')===0 || strpos($path, '/../')!==false) {
+		throw new Exception('cannot return path including ../: '.$path);
+	}
+
+	$path = $rootfilepath.$path;
+	return $path;
+}

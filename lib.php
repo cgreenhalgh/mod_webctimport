@@ -31,6 +31,13 @@ define('WEBCTIMPORT_NONE', 0);
 define('WEBCTIMPORT_FILE', 1);
 define('WEBCTIMPORT_EQUELLA', 2);
 
+/** import status */
+define('WEBCTIMPORT_STATUS_NEW', 0);
+define('WEBCTIMPORT_STATUS_WORKING', 1);
+define('WEBCTIMPORT_STATUS_DONE', 2);
+define('WEBCTIMPORT_STATUS_TRANSIENT_ERROR', 3);
+define('WEBCTIMPORT_STATUS_PERMANENT_ERROR', 4);
+
 /**
  * List of features supported in URL module
  * @param string $feature FEATURE_xx constant for requested feature
@@ -106,6 +113,12 @@ function webctimport_add_instance($data, $mform) {
     $data->displayoptions = serialize($displayoptions);
 
     $data->timemodified = time();
+    // set targettype? -> create webctfile/etc.
+    if ($data->targettype==WEBCTIMPORT_FILE) {
+    	// start file addition...
+    	$data->webctfileid = webctimport_add_webctfile($data);	
+    }
+    
     $data->id = $DB->insert_record('webctimport', $data);
 
     return $data->id;
@@ -134,8 +147,18 @@ function webctimport_update_instance($data, $mform) {
     $data->timemodified = time();
     $data->id           = $data->instance;
 
-    $DB->update_record('webctimport', $data);
+    // set targettype? -> create webctfile/etc.
+    if ($data->targettype==WEBCTIMPORT_FILE) {
+        if ($DB->get_field('webctimport', 'webctfileid', array('id'=>$data->id))===null) {    	
+	    	// start file addition...
+    		$data->webctfileid = webctimport_add_webctfile($data);	
+        }
+        else
+        	unset($data->webctfileid);
+    }
 
+    $DB->update_record('webctimport', $data);
+    
     return true;
 }
 
@@ -233,7 +256,7 @@ function webctimport_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
     require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 
-    if (!$url = $DB->get_record('webctimport', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, localfilepath, error, webctfileid')) {
+    if (!$url = $DB->get_record('webctimport', array('id'=>$coursemodule->instance), 'id, name, display, displayoptions, localfilepath, targettype, webctfileid')) {
         return NULL;
     }
 

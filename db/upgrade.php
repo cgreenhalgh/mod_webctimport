@@ -51,6 +51,97 @@ function xmldb_webctimport_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2011080301) {
 
+    	// webctfile table hasn't been used yet - just drop and re-create
+        $table = new xmldb_table('webctfile');
+    	
+        // Conditionally launch drop table for webctfile
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define table webctfile to be created
+        $table = new xmldb_table('webctfile');
+
+        // Adding fields to table webctfile
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '4', null, null, null, null);
+        $table->add_field('workerid', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('workertimestamp', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null);
+        $table->add_field('localfilepath', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('webctpath', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('error', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('owneruserid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table webctfile
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table webctfile
+        $table->add_index('webctpathindex', XMLDB_INDEX_NOTUNIQUE, array('webctpath (255)'));
+
+        // Conditionally launch create table for webctfile
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        
+        // webctimport table has been used...
+        // Define table webctimport to be created
+        $table = new xmldb_table('webctimport');
+
+	    // drop and re-create unused column webctfileid
+        $field = new xmldb_field('webctfileid');
+        // Conditionally launch drop field webctfileid
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('webctfileid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null, 'timemodified');
+        // Conditionally launch add field webctfileid
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        //$table->add_field('targettype', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
+        $field = new xmldb_field('targettype', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'webctfileid');
+        // Conditionally launch add field targettype
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // drop columns error, metadata & owners
+        $field = new xmldb_field('error');
+        // Conditionally launch drop field error
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('metadata');
+        // Conditionally launch drop field metadata
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        $field = new xmldb_field('owners');
+        // Conditionally launch drop field owners
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+        
+        // webctimport savepoint reached
+        upgrade_mod_savepoint(true, 2011080301, 'webctimport');
+    }
+    
+    if ($oldversion < 2011080302) {
+
+        // Define table webctimport to be created
+        $table = new xmldb_table('webctimport');
+    	
+        $field = new xmldb_field('owneruserid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null);
+        // Conditionally launch add field targettype
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        // webctimport savepoint reached
+        upgrade_mod_savepoint(true, 2011080302, 'webctimport');        
+    }
+    
     return true;
 }

@@ -107,6 +107,7 @@ foreach ($indexes as $index) {
 		$return = url_add_instance($mod, null);
 	} 
 	else if ($type=='f') {
+		global $USER;
 	    $mod->module = $webctimportmoduleid;
 		$mod->name = $item['title'];
 		if (isset($item['description'])) {
@@ -128,6 +129,9 @@ foreach ($indexes as $index) {
 		$mod->popupheight = $config->popupwidth;
 		$mod->printheading = $config->printheading;
 		$mod->printintro = $config->printintro;
+		
+		$mod->targettype = $config->importtype;
+		$mod->owneruserid = $USER->id;
 		
 		$return = webctimport_add_instance($mod, null);
 	}

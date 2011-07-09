@@ -26,13 +26,19 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
+
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot.'/mod/webctimport/locallib.php');
+
+MoodleQuickForm::registerElementType('webctimport', "$CFG->dirroot/mod/webctimport/form/webctimport.php", 'MoodleQuickForm_webctimport');
 
 class mod_webctimport_mod_form extends moodleform_mod {
 	var $form;
 	var $previewelement;
 	var $previewurl;
+	var $targettypelement;
+	var $webctimportelement;
 	
 	function definition() {
         global $CFG, $DB;
@@ -53,6 +59,19 @@ class mod_webctimport_mod_form extends moodleform_mod {
 
         //-------------------------------------------------------
         $mform->addElement('header', 'content', get_string('contentheader', 'webctimport'));
+
+        $this->targettypelement = $mform->addElement('select', 'targettype', get_string('targettype', 'webctimport'), 
+        	array(WEBCTIMPORT_NONE => get_string('importtypenone','webctimport'),
+	        	WEBCTIMPORT_FILE => get_string('importtypefile','webctimport'),
+    	    	WEBCTIMPORT_EQUELLA => get_string('importtypeequella','webctimport'))
+    	    );
+    	$mform->setDefault('targettype', $config->importtype);
+        
+        $this->webctimportelement = $mform->addElement('webctimport', 'webctfileid', get_string('importstatus', 'webctimport'));
+       	//$mform->setType('display', PARAM_TEXT);
+        $mform->addElement('hidden', 'localfilepath');
+        $mform->addElement('hidden', 'owneruserid');
+        
         $this->previewelement = $mform->addElement('static', 'previewlink', get_string('clicktopreview', 'webctimport', "(Preview)"));
 //        $mform->addElement('html', 
 //'<div id="checkstatus">Requires Javascript</div><script type="text/javascript">YUI().use("node", function(Y) { alert("hi!"); Y.one("#checkstatus").replace(Y.Node.create("<div>Checking...</div>")); });</script>');
@@ -145,9 +164,13 @@ class mod_webctimport_mod_form extends moodleform_mod {
 
     function set_data($data)
 	{
+		global $CFG;
+		
 		$this->form = $data;
 		if (isset($data->localfilepath))
 			$this->previewurl = "$CFG->wwwroot/mod/webctimport/read_file.php?path=".urlencode($data->localfilepath);
+		if (isset($data->id))
+			$this->webctimportelement->setWebctimportId($data->id);
 		parent::set_data($data);
 	}
     /**
@@ -159,6 +182,12 @@ class mod_webctimport_mod_form extends moodleform_mod {
     	if ($this->previewurl)
 	    	$this->previewelement->setLabel(get_string('clicktopreview', 'webctimport', 
 		    	"<a href=\"$this->previewurl\" target=\"_blank\">Preview</a>"));
+		// cannot change import type if in progress...
+		if (isset($this->form->targettype) && $this->form->targettype!=WEBCTIMPORT_NONE) {
+			// not sure if this is the best way to do this! but it seems to be working...
+			$this->targettypelement->freeze();
+			//debugging('Note: tried to make targettype constant');
+		}
     }
 
 	

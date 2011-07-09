@@ -9,19 +9,13 @@ require_login();
 $path = required_param('path', PARAM_PATH); // directory path
 $filename = required_param('filename', PARAM_FILE); // filename
 
-$config = get_config('webctimport');
-$rootfilepath = $config->rootfilepath;
-
-if (substr($rootfilepath, -1)=='/') {
-	$rootfilepath = substr($rootfilepath, 0, strlen($rootfilepath)-1);
-}
-
-if (strpos($path, '../')===0 || strpos($path, '/../')!==false) {
-	print_error('cannot return path including ../: '.$path);
+try {
+	// will check path etc.
+	$path = webctimport_get_file_content_path($path);
+} catch (Exception $e) {
+	print_error($e->getMessage());
 	return;
 }
-
-$path = $rootfilepath.$path;
 //$ix = strrpos($path, '/');
 //if ($ix!==false)
 //	$filename = substr($path, $ix+1);

@@ -3,33 +3,20 @@
 
 require_once("../../config.php");
 require_once("../../lib/filelib.php");
+require_once("locallib.php");
 
 require_login();
 
 $path = required_param('path', PARAM_PATH); // directory path
 
-$config = get_config('webctimport');
-$rootfolderpath = $config->rootfolderpath;
-
-if (substr($rootfolderpath, -1)=='/') {
-	$rootfolderpath = substr($rootfolderpath, 0, strlen($rootfolderpath)-1);
-}
-
-if (strpos($path, '../')===0 || strpos($path, '/../')!==false) {
-	print_error('cannot return path including ../: '.$path);
+try {
+	// will check path etc.
+	$info = webctimport_get_file_info($path);
+} catch (Exception $e) {
+	print_error($e->getMessage());
 	return;
 }
-
-$path = $rootfolderpath.$path.'/file.json';
-
-debugging('get_file '.$path);
-
-$json = file_get_contents($path);
-if ($json===FALSE) {
-	print_error('cannot find requested file information: '.$path);
-	return;
-}
-$info = json_decode($json);
+	
 $rawpath = $info->path;
 $filename = $info->filename;
 if (empty($rawpath)) {
