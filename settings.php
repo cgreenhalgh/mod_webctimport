@@ -31,7 +31,10 @@ if ($ADMIN->fulltree) {
 	require_once("$CFG->dirroot/mod/webctimport/lib.php");
     
     $settings->add(new admin_setting_configdirectory('webctimport/rootfilepath',
-        get_string('rootfilepath', 'webctimport'), get_string('configrootfilepath', 'webctimport'), "/webctimport"));
+        get_string('rootfilepath', 'webctimport'), get_string('configrootfilepath', 'webctimport'), "/webctimport/files"));
+
+    $settings->add(new admin_setting_configdirectory('webctimport/rootfolderpath',
+        get_string('rootfolderpath', 'webctimport'), get_string('configrootfolderpath', 'webctimport'), "/webctimport/folders"));
 
     $settings->add(new admin_setting_configselect('webctimport/importtype',
         get_string('importtype', 'webctimport'), get_string('configimporttype', 'webctimport'), 

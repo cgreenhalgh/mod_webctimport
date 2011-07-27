@@ -41,9 +41,14 @@ This modules is intended to:
   File item.
 
 Chris Greenhalgh, 2011-07-11
+
+CHANGES
+=======
+
+- 2011-08-01: modified to use latest webctdbexport file format, i.e. separate user area,
+  files in common SHA-1 pool with file.json redirect.
   
 TO DO
 =====
 
-- implement it all...
-
+- implement final import/convert placeholder to File (or Equella link)
