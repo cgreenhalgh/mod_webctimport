@@ -47,8 +47,36 @@ CHANGES
 
 - 2011-08-01: modified to use latest webctdbexport file format, i.e. separate user area,
   files in common SHA-1 pool with file.json redirect.
+
+- 2011-08-03: modified tables to only required fields; first implementation of
+  import to moodle file.
+
   
 TO DO
 =====
 
-- implement final import/convert placeholder to File (or Equella link)
+- document import, e.g. status.php, import.php, form/webctimport.php
+- implement worker timeout and error retry in import
+- when creating moodle file use owner user context, not current user context.
+- check/set up page context in all files, e.g. treeview.php - see error log
+- check permissions in (a) treeviewsubmit (b) get_listing (c) get_file (d)
+  get_rawfile.
+- add support for exporting TOC items from webct (modules)
+- add support for importing TOC items
+- allow a set of files (e.g.) a directory to be imported as a mini-site
+  (creates one moodle file or equella item)
+- disable import as equella while unimplemented
+- implement import to equella ?
+- allow import to file to be limited by file size (setting)
+- change tree view form encoding/submission to not depend on input name
+  encoding
+- add un/select of children to tree view
+- tidy up formatting of tree view, e.g. Expand button height
+- add icons to tree view
+- ? show hints about already import items in tree view
+- for equella import, use already imported item, if any (scope by module?!)
+
+
+- implement facility to convert moodle file (resource) items to equella item
+  with import/search.
+
