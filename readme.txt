@@ -55,7 +55,6 @@ CHANGES
 TO DO
 =====
 
-- document import, e.g. status.php, import.php, form/webctimport.php
 - implement worker timeout and error retry in import
 - when creating moodle file use owner user context, not current user context.
 - check/set up page context in all files, e.g. treeview.php - see error log
