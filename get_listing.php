@@ -20,6 +20,7 @@ if (strpos($path, '../')===0 || strpos($path, '/../')!==false) {
 	return;
 }
 
+$toplevel = 0;
 if ($path=='/' || strlen($path)==0) {
 	global $USER;
 	// user-specific root
@@ -29,15 +30,19 @@ if ($path=='/' || strlen($path)==0) {
 		return;
 	}
 	$path = '/user/'.substr($username, 0, 2).'/'.substr($username, 0, 3).'/'.$username.'/';
-	debugging('get_listing of root for '.$username.' -> '.$path);
+	//debugging('get_listing of root for '.$username.' -> '.$path);
+	$toplevel = 1;
 } 
 
 $jsontext = file_get_contents($rootfolderpath.$path.'get_listing.json');
 if ($jsontext==false) {
 	debugging('Not found: get_listing from '.$rootfolderpath.' '.$path);
-	echo '{"error":"File not found"}';
+	if ($toplevel)
+		echo '{"error":"This user does not have any files from WebCT"}';
+	else
+		echo '{"error":"File not found"}';
 }
 else {
-	debugging('get_listing from '.$rootfolderpath.$path.' -> '.$jsontext);
+	//debugging('get_listing from '.$rootfolderpath.$path.' -> '.$jsontext);
 	echo $jsontext;
 }

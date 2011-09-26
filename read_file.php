@@ -23,5 +23,5 @@ if (empty($rawpath)) {
 	print_error('cannot find path in file information: '.$path);
 	return;
 }
-debugging('get_file redirects to '.$path.' -> '.$rawpath.' (filename '.$filename.')');
+//debugging('get_file redirects to '.$path.' -> '.$rawpath.' (filename '.$filename.')');
 redirect($CFG->wwwroot.'/mod/webctimport/read_rawfile.php?path='.urlencode($rawpath).'&filename='.urlencode($filename));

@@ -69,7 +69,7 @@ while (true) {
 	if ($file->status==WEBCTIMPORT_STATUS_NEW || $file->status==WEBCTIMPORT_STATUS_TRANSIENT_ERROR) {
 		// we try...
 		//$DB->
-		$workerid = uniqid(gethostname(), $true);
+		$workerid = uniqid(gethostname(), true);
 		$file->workerid = $workerid;
 		$file->workertimestamp = time();
 		$file->status = WEBCTIMPORT_STATUS_WORKING;
@@ -80,7 +80,7 @@ while (true) {
 				debugging('Someone else beat us to the import: '.$workerid);
 				continue;
 			}
-			debugging('Try import on '.$file->id);
+			//debugging('Try import on '.$file->id);
 
 			$fileinfo = webctimport_get_file_info($file->localfilepath);
 			if (!$fileinfo || !isset($fileinfo->path)) {
@@ -128,7 +128,7 @@ while (true) {
 			resource_set_mainfile($res);
 			
 			set_status($webctfileid, WEBCTIMPORT_STATUS_DONE, null);
-			debugging('done import of '.$webctfileid);
+			//debugging('done import of '.$webctfileid);
 			webctimport_delete_instance($webctimport->id);
 			
 			show_resource($res->id);

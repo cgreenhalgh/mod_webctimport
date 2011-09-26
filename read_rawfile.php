@@ -4,6 +4,8 @@
 require_once("../../config.php");
 require_once("../../lib/filelib.php");
 
+require_once($CFG->dirroot.'/mod/webctimport/locallib.php');
+
 require_login();
 
 $path = required_param('path', PARAM_PATH); // directory path
@@ -22,6 +24,6 @@ try {
 //else
 //	$filename = $path;
 
-debugging('get_file '.$path);
+//debugging('get_file '.$path);
 
 send_file($path, urldecode($filename));

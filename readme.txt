@@ -45,6 +45,9 @@ Chris Greenhalgh, 2011-07-11
 CHANGES
 =======
 
+- 2011-10-03: fixed some outstanding bugs that broke use with IE8 and/or Moodle 2.1.
+  removed most debugging output.
+
 - 2011-08-01: modified to use latest webctdbexport file format, i.e. separate user area,
   files in common SHA-1 pool with file.json redirect.
 
@@ -57,7 +60,6 @@ TO DO
 
 - implement worker timeout and error retry in import
 - when creating moodle file use owner user context, not current user context.
-- check/set up page context in all files, e.g. treeview.php - see error log
 - check permissions in (a) treeviewsubmit (b) get_listing (c) get_file (d)
   get_rawfile.
 - add support for exporting TOC items from webct (modules)

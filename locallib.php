@@ -193,7 +193,7 @@ function webctimport_get_file_info($path) {
 
 	$path = $rootfolderpath.$path.'/file.json';
 
-	debugging('get_file '.$path);
+	//debugging('get_file '.$path);
 
 	$json = file_get_contents($path);
 	if ($json===FALSE) {

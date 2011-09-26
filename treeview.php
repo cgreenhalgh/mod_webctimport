@@ -15,6 +15,16 @@ $mod->coursemodule = required_param('coursemodule', PARAM_INT);
 $mod->section = required_param('section', PARAM_INT);
 $mod->modulename = "webctimport";
 
+$urlparams = (array)$mod;
+$baseurl = new moodle_url('/mod/webctimport/importorgdata.php', $urlparams);
+$PAGE->set_url($baseurl);
+
+$course = $DB->get_record('course', array('id'=>$mod->course), '*', MUST_EXIST);
+require_course_login($course, true);
+//$context = get_context_instance(CONTEXT_COURSE, $mod->course);
+$PAGE->set_course($course);
+//$PAGE->set_context(get_course_context($course));
+
 $PAGE->set_pagelayout('popup');
 
 //$PAGE->set_url('/mod/webctimport/index.php', array('id' => $course->id));

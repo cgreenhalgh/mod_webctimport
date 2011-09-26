@@ -5,19 +5,20 @@
 require_once("../../config.php");
 require_once("../../course/lib.php");
 require_once("../../lib/resourcelib.php");
-require_once("lib.php");
+//require_once("lib.php");
+require_once($CFG->dirroot.'/mod/webctimport/locallib.php');
 
 global $CFG;
 
 //global $DB;
-debugging('treeviewsubmit.php...');
+//debugging('treeviewsubmit.php...');
 
 $courseid = required_param('course', PARAM_INT);
 $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 
 require_course_login($course, true);
 
-debugging('treeviewsubmit.php (2)...');
+//debugging('treeviewsubmit.php (2)...');
 
 //$moduleid = required_param('module', PARAM_INT);
 //$mod->coursemodule = required_param('coursemodule', PARAM_INT);
@@ -30,7 +31,7 @@ $urlmoduleid = $DB->get_record('modules', array('name'=>'url'), '*', MUST_EXIST)
 $labelmoduleid = $DB->get_record('modules', array('name'=>'label'), '*', MUST_EXIST)->id;
 
 
-debugging('treeviewsubmit.php (3)...');
+//debugging('treeviewsubmit.php (3)...');
 
 require_once("../label/lib.php");
 require_once("../url/lib.php");
@@ -40,7 +41,7 @@ $items = array();
 $minindent = 100;
 
 foreach ($_POST as $key => $value) {
-	debugging('param '.$key.' = '.$value);
+	//debugging('param '.$key.' = '.$value);
 	if (strpos($key, 'index')===0) {
 		//$key = urldecode($key);
 		$atts = explode('&', $key);
@@ -67,7 +68,7 @@ $labelindexes = array();
 
 foreach ($indexes as $index) {
 	$item = $items[$index];
-	debugging('add '.$item['type'].' '.$item['title']);
+	//debugging('add '.$item['type'].' '.$item['title']);
 	$type = $item['type'];
     $mod = new stdClass();
     $mod->course = $courseid;
@@ -158,41 +159,6 @@ foreach ($indexes as $index) {
 }
 
 rebuild_course_cache($mod->course);
-
-// TODO ...
-/*
-foreach ($links as $link)
-{
-	$mod->name = $link["name"];
-	$mod->intro = $link["description"];
-	$mod->introformat = FORMAT_HTML;
-	$mod->url = $link["url"];
-	if (isset($link["activationUuid"]))
-	{
-		$mod->activation = $link["activationUuid"];
-	}
-	$return = equella_add_instance($mod);
-
-	$mod->instance = $return;
-
-	// course_modules and course_sections each contain a reference
-	// to each other, so we have to update one of them twice.
-	if (! $mod->coursemodule = add_course_module($mod) ) {
-		error("Could not add a new course module");
-	}
-
-	if (! $sectionid = add_mod_to_section($mod) ) {
-		error("Could not add the new course module to that section");
-	}
-
-	if (! $DB->set_field("course_modules", "section", $sectionid, array("id" => $mod->coursemodule))) {
-		error("Could not update the course module with the correct section");
-	}
-	set_coursemodule_visible($mod->coursemodule, true);
-}
-
-rebuild_course_cache($mod->course);
-*/
 
 ?><html>
 <head>
