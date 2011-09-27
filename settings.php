@@ -29,7 +29,11 @@ defined('MOODLE_INTERNAL') || die;
 if ($ADMIN->fulltree) {
     require_once("$CFG->libdir/resourcelib.php");
 	require_once("$CFG->dirroot/mod/webctimport/lib.php");
-    
+
+	//--- module settings -----------------------------------------------------------------------------------
+	$link ='<a href="'.$CFG->wwwroot.'/mod/webctimport/users.php">'.get_string('configmodeditusers', 'mod_webctimport').'</a>';
+	$settings->add(new admin_setting_heading('mod_webctimport/users', '', $link));
+	
     $settings->add(new admin_setting_configdirectory('webctimport/rootfilepath',
         get_string('rootfilepath', 'webctimport'), get_string('configrootfilepath', 'webctimport'), "/webctimport/files"));
 

@@ -34,7 +34,16 @@ $capabilities = array(
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
         )
-    ),
+	),
+
+	// Manage extra user access
+    'mod/webctimport:manageusers' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+		)
+	),
 
 /* TODO: review public portfolio API first!
     'mod/url:portfolioexport' => array(
