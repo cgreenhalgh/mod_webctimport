@@ -83,9 +83,9 @@ encode: function(text) {
 add_subtree: function(Y, node, item, index) {
 	var subtree = Y.Node.create('<ul><li><input type="button" value="+"/></li></ul>');
 	node.append(subtree);
-	var button = subtree.one('li input');
+	var button = subtree.one('input');
 	//alert('button = '+button);
-	button.set('onclick', function() {
+	button.on('click', function() {
 		//alert('!3');
 		M.mod_webctimport.expand(Y, subtree, item.path, index);
 	});
