@@ -22,7 +22,7 @@ init_grant_treeview: function(Y) {
 
 load_node: function(Y, node, path, index, get_listing) {
 	node.all('li').remove();
-	node.append('<li>Loading...</li>');
+	node.append('<li class="mod_webctimport_item">Loading...</li>');
 	Y.io(get_listing+'?path='+encodeURIComponent(path), {
 		on: {
 		success: function(id, o, args) {
@@ -32,7 +32,7 @@ load_node: function(Y, node, path, index, get_listing) {
 	failure: function(id, o, args) {
 		//alert('failure: '+o+': '+o.statusText);
 		node.all('li').remove();
-		node.append('<li>Sorry: '+o+': '+o.statusText+'</li>');
+		node.append('<li class="mod_webctimport_item">Sorry: '+o+': '+o.statusText+'</li>');
 		// args might be useful
 	}
 	}
@@ -41,12 +41,12 @@ load_node: function(Y, node, path, index, get_listing) {
 
 build_tree: function(Y, node, responseText, index, get_listing) {
 	node.all('li').remove();
-	//node.append('<li>Debug - response: '+responseText+'</li>');
+	//node.append('<li class="mod_webctimport_item">Debug - response: '+responseText+'</li>');
 	var json = Y.JSON.parse(responseText);
-	//node.append('<li>Debug - json: '+json+'</li>');
+	//node.append('<li class="mod_webctimport_item">Debug - json: '+json+'</li>');
 	var error = json.error;
 	if (error!=undefined) {
-		node.append('<li>Sorry: '+error+'</li>');
+		node.append('<li class="mod_webctimport_item">Sorry: '+error+'</li>');
 		return;
 	}
 	var list = json.list;
@@ -71,16 +71,21 @@ build_tree: function(Y, node, responseText, index, get_listing) {
 		else {
 			// file
 			path = path+'&type=f&path='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
+			if (item.lastmodifiedts!=undefined)
+				linkextra = linkextra+' title="Last modified: '+new Date(item.lastmodifiedts).toLocaleString()+'"';
 			li = li+' <a href="read_file.php?path='+encodeURIComponent(item.source)+'"'+linkextra+'>Preview file</a>';
 		}
 		if (item.description!=undefined && item.description.length>0) {
 			path = path+'&description='+M.mod_webctimport.encode(item.description);
-			li = li+'<br>'+item.description;
+			li = li+'<br><div class="mod_webctimport_item_description">'+item.description+'</div>';
 		}
-		li = '<li class="mod_webctimport_item"><input class="mod_webctimport_checkbox" type="checkbox" name="'+path+'"> '+item.title+li+'</li>';
-		node.append(li);
+		var icon = '<img src="'+item.iconurl+'"  class="activityicon"/>';
+		var debug = '';//' ('+item.webcttype+')';
+		li = '<li class="mod_webctimport_item">'+icon+'.<input class="mod_webctimport_checkbox" type="checkbox" name="'+path+'"> '+item.title+debug+li+'</li>';
+		var n = Y.Node.create(li);
+		node.append(n);
 		if (item.path!=undefined) {
-			M.mod_webctimport.add_subtree(Y, node, item, itemindex, get_listing);
+			M.mod_webctimport.add_subtree(Y, node, item, itemindex, get_listing, n.one('.activityicon'));
 		}
 	}
 },
@@ -90,13 +95,29 @@ encode: function(text) {
 	return text.replace(/[.]/g,'%2E');
 },
 
-add_subtree: function(Y, node, item, index, get_listing) {
-	var subtree = Y.Node.create('<ul class="mod_webctimport_list"><li class="mod_webctimport_item"><input class="mod_webctimport_expand" type="button" value="+"/></li></ul>');
-	node.append(subtree);
-	var button = subtree.one('input');
+add_subtree: function(Y, node, item, index, get_listing, button) {
+	var subtree = Y.Node.create('<ul class="mod_webctimport_list"></ul>');
+	node.appendChild(subtree);
+	//var button = subtree.one('input');
 	//alert('button = '+button);
 	button.on('click', function() {
 		//alert('!3');
+		// replace button??
+		var openicon = Y.Node.create('<img src="'+item.iconurl.replace('closed','open')+'"  class="activityicon"/>');
+		button.replace(openicon);
+		openicon.on('click', function(e) {
+			var iconurl = e.target.get('src');
+			if (iconurl.indexOf('closed')>=0) {
+				iconurl = iconurl.replace('closed','open');
+				openicon.set('src',iconurl);
+				subtree.removeClass('mod_webctimport_hidden');
+			}
+			else {
+				iconurl = iconurl.replace('open', 'closed');
+				openicon.set('src',iconurl);
+				subtree.addClass('mod_webctimport_hidden');
+			}
+		});
 		M.mod_webctimport.expand(Y, subtree, item.path, index, get_listing);
 	});
 },

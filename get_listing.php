@@ -3,8 +3,11 @@
 // webctimport cache.
 
 require_once("../../config.php");
+require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 
 require_login();
+$context = get_context_instance(CONTEXT_SYSTEM);
+$PAGE->set_context($context);
 
 $path = required_param('path', PARAM_PATH); // directory path
 
@@ -43,33 +46,29 @@ if ($jsontext==false) {
 		return;
 	}
 }
+try {
+	if ($jsontext==false) {
+		// synthentic get_listing...
+		$json = new stdClass();
+		$json->path = array();
+		$pathel = new stdClass();
+		$pathel->name = 'WebCT/grant ('.$USER->username.')';
+		$pathel->path = '/';
+		$json->path[] = $pathel;
+		$json->nologin = true;
+		$json->list = array();
+	}
+	else
+		$json = json_decode($jsontext);
+}
+catch (Exception $e) {
+	debugging('get_listing, decode: '.$e->getMessage());
+	echo $jsontext;
+}
+
 if ($toplevel) {
 	$grants = $DB->get_records('webctgrant',array('userid'=>$USER->id));
-	if (count($grants)==0) {
-		if ($jsontext==false) {
-			echo '{"error":"This user does not have any files from WebCT"}';
-			return;
-		}
-		else {
-			echo $jsontext;
-			return;
-		}
-	}
 	try {
-		if ($jsontext==false) {
-			// synthentic get_listing...
-			$json = new stdClass();
-			$json->path = array();
-			$pathel = new stdClass();
-			$pathel->name = 'WebCT/grant ('.$USER->username.')';
-			$pathel->path = '/';
-			$json->path[] = $pathel;
-			$json->nologin = true;
-			$json->list = array();			
-		}
-		else
-			$json = json_decode($jsontext);
-		
 		foreach ($grants as $grant) {
 			$item = new stdClass();
 			$item->title = $grant->title.' (granted access)';
@@ -80,16 +79,15 @@ if ($toplevel) {
 			$item->path = $grant->path;
 			$json->list[] = $item;
 		}
-		
-		echo json_encode($json);
-		return;
 	}
 	catch (Exception $e) {
 		debugging('get_listing, extra grants: '.$e->getMessage());
 		echo $jsontext;
 	}
 }
-else {
-	//debugging('get_listing from '.$rootfolderpath.$path.' -> '.$jsontext);
-	echo $jsontext;
+
+foreach ($json->list as $item) {
+	webctimport_get_item_extra_info($item);
 }
+
+echo json_encode($json);

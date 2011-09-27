@@ -266,3 +266,40 @@ function webctimport_can_import($webctimport) {
 	}
 	return false;
 }
+
+/** 
+ * 
+ * guess icon url
+ * @param stdclass $item get_listing/get_context reponse item for JS tree view
+ * @return guessed url for icon
+ */
+function webctimport_get_iconurl($item) {
+	global $OUTPUT;
+	// TODO more complete choice of icon?
+	if ($item->webcttype=='URL_TYPE/Default')
+		return ''.$OUTPUT->pix_url('f/web');
+	if ($item->webcttype=='PAGE_TYPE/Default')
+		//$item->webcttype=='ContentFile/HTML' || 
+		return ''.$OUTPUT->pix_url('f/html');
+	else if (!empty($item->path))
+		return ''.$OUTPUT->pix_url('i/closed');
+	else
+		return ''.$OUTPUT->pix_url('f/unknown');
+}
+
+/**
+ * get file extra information
+ * @param stdClass $item get_listing item
+ */
+function webctimport_get_item_extra_info($item) {
+	if (isset($item->source) && $item->webcttype!='URL_TYPE/Default') {
+		try {
+			$fileinfo = webctimport_get_file_info($item->source);
+			if (!empty($fileinfo)) {
+				$item->lastmodifiedts = $fileinfo->lastmodifiedts;
+				$item->mimetype = $fileinfo->mimetype;
+			}
+		} catch (Exception $e) { /*ignore */ }
+	}
+	$item->iconurl = webctimport_get_iconurl($item);
+}

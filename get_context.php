@@ -4,8 +4,11 @@
 // directory structure
 
 require_once("../../config.php");
+require_once("$CFG->dirroot/mod/webctimport/locallib.php");
 
 require_login();
+$context = get_context_instance(CONTEXT_SYSTEM);
+$PAGE->set_context($context);
 
 $path = required_param('path', PARAM_PATH); // directory path
 
@@ -33,8 +36,10 @@ else {
 		$json = json_decode($jsontext);
 		$list = array();
 		foreach ($json->list as $item) {
-			if ($item->webcttype=='Institution' || $item->webcttype=='Course' || $item->webcttype=='Section')
+			if ($item->webcttype=='Institution' || $item->webcttype=='Course' || $item->webcttype=='Section') {
+				webctimport_get_item_extra_info($item);
 				$list[] = $item;
+			}
 		}
 		$json->list = $list;
 		//debugging('get_listing from '.$rootfolderpath.$path.' -> '.$jsontext);
