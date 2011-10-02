@@ -233,3 +233,36 @@ function webctimport_embed($url, $title) {
     $PAGE->requires->js_init_call('M.util.init_maximised_embed', array('resourceobject'), true);
 	return webctimport_change_parent_url_helper().'<div class="resourcecontent resourcegeneral"><iframe src="'.$url.'" width="800" height="600">'.$title.'</iframe></div>';
 }
+function webctimport_get_status($webctimport) {
+	global $DB;
+	$webctfileid = $webctimport->webctfileid;
+	$file = $DB->get_record('webctfile', array('id'=>$webctfileid));
+	if ($file) {
+		if ($file->status==WEBCTIMPORT_STATUS_NEW) {
+			return 'New';
+		}
+		else if ($file->status==WEBCTIMPORT_STATUS_WORKING) {
+			return 'Importing';	
+		}
+		else if ($file->status==WEBCTIMPORT_STATUS_DONE) {
+			return 'Done (should be replaced!)';
+		}
+		else if ($file->status==WEBCTIMPORT_STATUS_TRANSIENT_ERROR) {
+			return $file->error.' (transient)';	
+		}
+		else if ($file->status==WEBCTIMPORT_STATUS_PERMANENT_ERROR)
+			return $file->error;		
+	}
+	return 'Unknown';
+}
+function webctimport_can_import($webctimport) {
+	global $DB;
+	$webctfileid = $webctimport->webctfileid;
+	$file = $DB->get_record('webctfile', array('id'=>$webctfileid));
+	if ($file) {
+		if ($file->status==WEBCTIMPORT_STATUS_NEW || 
+			$file->status==WEBCTIMPORT_STATUS_WORKING)
+		return true;
+	}
+	return false;
+}

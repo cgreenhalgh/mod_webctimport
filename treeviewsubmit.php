@@ -164,7 +164,7 @@ rebuild_course_cache($mod->course);
 <head>
 <title>Added items...</title>
 <script type="text/javascript">
-<?php echo webctimport_change_parent_url_call("$CFG->wwwroot/course/view.php?id=$mod->course"); ?>
+<?php echo webctimport_change_parent_url_call("$CFG->wwwroot/mod/webctimport/index.php?id=$mod->course"); ?>
 </script>
 </head>
 <body>

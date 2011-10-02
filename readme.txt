@@ -45,6 +45,9 @@ Chris Greenhalgh, 2011-07-11
 CHANGES
 =======
 
+- 2011-10-10: add resource redirects to webctimport index, which attempts to import 
+  resources one by one. 
+
 - 2011-10-10: replaced window.parent.document.location=... parent redirects with javascript
   function call that should work on IE8 (as well as other browsers).
 

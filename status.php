@@ -6,6 +6,8 @@ require_once("lib.php");
 require_once("locallib.php");
 
 $webctfileid = required_param('webctfileid', PARAM_TEXT); 
+$courseindexid = optional_param('courseindexid', 0, PARAM_INT);
+
 
 ?><div><?php 
 if (empty($webctfileid)) {
@@ -30,10 +32,10 @@ if (empty($webctfileid)) {
 
 	global $DB, $CFG;
 
-	function print_import($webctfileid, $id) {
+	function print_import($webctfileid, $id, $courseindexid) {
 		global $CFG;
 		?><script>
-window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/import.php?webctfileid=$webctfileid&id=$id" ?>';
+window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/import.php?webctfileid=$webctfileid&id=$id&courseindexid=$courseindexid" ?>';
 </script><?php 
 	}
 
@@ -41,11 +43,11 @@ window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/import.ph
 	if ($file) {
 		if ($file->status==WEBCTIMPORT_STATUS_NEW) {
 			echo 'New...';
-			print_import($webctfileid, $id);			
+			print_import($webctfileid, $id, $courseindexid);			
 		}
 		else if ($file->status==WEBCTIMPORT_STATUS_WORKING) {
 			echo 'Importing...';	
-			print_import($webctfileid, $id);
+			print_import($webctfileid, $id, $courseindexid);
 		}
 		else if ($file->status==WEBCTIMPORT_STATUS_DONE) {
 			echo 'Done (should be replaced!)';
@@ -54,7 +56,7 @@ window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/import.ph
 		}
 		else if ($file->status==WEBCTIMPORT_STATUS_TRANSIENT_ERROR) {
 			echo $file->error.' - retrying...';	
-			print_import($webctfileid, $id);
+			print_import($webctfileid, $id, $courseindexid);
 		}
 		else if ($file->status==WEBCTIMPORT_STATUS_PERMANENT_ERROR)
 			echo $file->error;		

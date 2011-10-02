@@ -7,6 +7,7 @@ require_once("locallib.php");
 
 $webctfileid = required_param('webctfileid', PARAM_INT); 
 $id = required_param('id', PARAM_INT); 
+$courseindexid = optional_param('courseindexid', 0, PARAM_INT);
 
 $webctimport = $DB->get_record('webctimport', array('id'=>$id), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('webctimport', $webctimport->id, $webctimport->course, false, MUST_EXIST);
@@ -27,14 +28,19 @@ global $DB, $CFG;
 function print_status($webctfileid, $id) {
 	global $CFG;
 ?><script type="text/javascript">
-window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/status.php?webctfileid=$webctfileid&id=$id" ?>';
+window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/status.php?webctfileid=$webctfileid&id=$id&courseindexid=$courseindexid" ?>';
 </script><?php 
 }
 
-function show_resource($resid) {
+function show_resource($resid, $courseindexid) {
 	global $CFG;
 ?><script type="text/javascript">
-<?php echo webctimport_change_parent_url_call("$CFG->wwwroot/mod/resource/view.php?r=$resid"); ?>
+<?php 
+	if (!$courseindexid)
+		echo webctimport_change_parent_url_call("$CFG->wwwroot/mod/resource/view.php?r=$resid"); 
+	else
+		echo webctimport_change_parent_url_call("$CFG->wwwroot/mod/webctimport/index.php?id=$courseindexid"); 
+	?>
 </script><?php 
 }
 
@@ -131,7 +137,7 @@ while (true) {
 			//debugging('done import of '.$webctfileid);
 			webctimport_delete_instance($webctimport->id);
 			
-			show_resource($res->id);
+			show_resource($res->id, $courseindexid);
 		}
 		catch (Exception $e) {
 			try {
