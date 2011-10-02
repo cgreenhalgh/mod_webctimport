@@ -109,7 +109,8 @@ function form_webctimport_render($options) {
     	'id'=>$options->webctimportId,
         ));
 	
-    $html = "<div><object type='text/html' data='$url' height='48' width='400' style='border:1px solid #000'></object></div>";
+    $html = webctimport_change_parent_url_helper();
+    $html = $html."<div><iframe src='$url' height='48' width='400' style='border:1px solid #000'>Sorry, cannot show status</iframe></div>";
 
     return $html;
 }

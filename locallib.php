@@ -218,3 +218,18 @@ function webctimport_get_file_content_path($path) {
 	$path = $rootfilepath.$path;
 	return $path;
 }
+function webctimport_change_parent_url_helper() {
+	// helper function because window.parent.document.location is not writable
+	return '<script type="text/javascript">function change_parent_url(url) { document.location=url; }</script>';
+}
+function webctimport_change_parent_url_call($url) {
+	return 'window.parent.change_parent_url("'.$url.'");';
+}
+function webctimport_embed($url, $title) {
+	global $PAGE;
+	// see resourcelib.
+    // the size is hardcoded in the boject obove intentionally because it is adjusted by the following function on-the-fly
+    //return resourcelib_embed_general($url, null, $title, "text/html");
+    $PAGE->requires->js_init_call('M.util.init_maximised_embed', array('resourceobject'), true);
+	return webctimport_change_parent_url_helper().'<div class="resourcecontent resourcegeneral"><iframe src="'.$url.'" width="800" height="600">'.$title.'</iframe></div>';
+}

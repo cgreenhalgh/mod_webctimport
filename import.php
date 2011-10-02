@@ -26,15 +26,15 @@ global $DB, $CFG;
 
 function print_status($webctfileid, $id) {
 	global $CFG;
-?><script>
+?><script type="text/javascript">
 window.document.location = '<?php print "$CFG->wwwroot/mod/webctimport/status.php?webctfileid=$webctfileid&id=$id" ?>';
 </script><?php 
 }
 
 function show_resource($resid) {
 	global $CFG;
-?><script>
-window.parent.document.location = '<?php print "$CFG->wwwroot/mod/resource/view.php?r=$resid" ?>';
+?><script type="text/javascript">
+<?php echo webctimport_change_parent_url_call("$CFG->wwwroot/mod/resource/view.php?r=$resid"); ?>
 </script><?php 
 }
 

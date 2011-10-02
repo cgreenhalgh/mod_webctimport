@@ -207,7 +207,7 @@ class mod_webctimport_mod_form extends moodleform_mod {
 				. '&modulename='.urlencode($form->modulename)
 				. '&instance='.urlencode($form->instance);
 
-			echo resourcelib_embed_general($url, null, 'WebCT import browser should open here!', 'text/html');
+			echo webctimport_embed($url, 'WebCT import browser should open here!');
 		}
 		else
 		{

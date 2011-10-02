@@ -45,6 +45,9 @@ Chris Greenhalgh, 2011-07-11
 CHANGES
 =======
 
+- 2011-10-10: replaced window.parent.document.location=... parent redirects with javascript
+  function call that should work on IE8 (as well as other browsers).
+
 - 2011-10-03: fixed some outstanding bugs that broke use with IE8 and/or Moodle 2.1.
   removed most debugging output.
 
