@@ -12,6 +12,7 @@ $page         = optional_param('page', 0, PARAM_INT);
 $perpage      = optional_param('perpage', 30, PARAM_INT);        // how many per page
 $filter       = optional_param('filter', '', PARAM_TEXT);        
 $action       = optional_param('action', '', PARAM_TEXT);        // add, 
+$confirm      = optional_param('confirm', 0, PARAM_INT);        // add,
 
 $path = '/mod/webctimport/users.php';
 
@@ -36,18 +37,110 @@ $manageusers = new moodle_url($path); //, $urlparams);
 $PAGE->navbar->add(get_string('activities'));
 $PAGE->navbar->add(get_string('pluginname', 'mod_webctimport'), $settingsurl);
 $PAGE->navbar->add(get_string('manageusers', 'mod_webctimport'), $manageusers);
-echo $OUTPUT->header();
 
 if ($action=='add') {
 	$userid = required_param('userid', PARAM_INT);
 	
 	$user = $DB->get_record('user',array('id'=>$userid));
-	echo $OUTPUT->heading(get_string('manageusersadd', 'mod_webctimport', $user));
+	if (!$user) 
+		print_error('unknownuser','mod_webctimport');
 	
-	echo $OUTPUT->footer();
+	if (!$confirm) {
+		// form
+		echo $OUTPUT->header();
+		echo $OUTPUT->heading(get_string('manageusersadd', 'mod_webctimport', $user));
+
+		$PAGE->requires->js_init_call('M.mod_webctimport.init_grant_treeview', array());
+		
+		?>
+		<p>Select WebCT contexts to grant access to:</p>
+		<form action="users.php" method="POST">
+		<?php
+		echo '<input type="hidden" name="sort" value="'.$sort.'">';
+		echo '<input type="hidden" name="dir" value="'.$dir.'">';
+		echo '<input type="hidden" name="page" value="'.$page.'">';
+		echo '<input type="hidden" name="perpage" value="'.$perpage.'">';
+		echo '<input type="hidden" name="filter" value="'.$filter.'">';
+		echo '<input type="hidden" name="userid" value="'.$userid.'">';
+		echo '<input type="hidden" name="action" value="add">';
+		echo '<input type="hidden" name="confirm" value="1">';
+		// sessKey? modulename? instance?
+		?>
+		<ul id="treeview_root">
+			<li>...</li>
+		</ul>
+		<input type="submit" value="Grant access to selected items">
+		</form>
+		<?php 
+		$params = $urlparams;
+		unset($params['action']);
+		echo $OUTPUT->single_button(new moodle_url($path,$urlparams), get_string('cancel'));				
+		
+		echo $OUTPUT->footer();
+	}
+	else {
+		// submit -see treeviewsubmit
+		foreach ($_POST as $key => $value) {
+			//debugging('param '.$key.' = '.$value);
+			if (strpos($key, 'index')===0) {
+				//$key = urldecode($key);
+				$atts = explode('&', $key);
+				$item = array();
+				foreach ($atts as $att) {
+					if (($ix = strpos($att,'='))!==false) {
+						$item[substr($att,0,$ix)] = urldecode(substr($att,$ix+1));
+					}
+				}
+				$grant = new stdClass();
+				$grant->title = $item['title'];
+				if (isset($item['description']))
+					$grant->description = $item['description'];
+				else
+					$grant->description = '';
+				$grant->path = $item['path'];
+				$grant->granted = time();
+				$grant->grantedby = $USER->id;
+				$grant->size = 0;
+				$grant->webcttype = 'GrantContext';
+				$grant->userid = $user->id;				
+				$grant->id = $DB->insert_record('webctgrant', $grant);
+				if (!$grant->id) 
+					print_error('addinggrant','mod_webctimport');
+				
+				debugging('Granted '.$user->username.' access to '.$grant->path);	
+			}
+		}
+		
+		redirect($baseurl);
+	}
 	return;
 }
+else if ($action=='delete') {
+	
+	$grantid = required_param('grantid', PARAM_INT);
+	
+	$grant = $DB->get_record('webctgrant',array('id'=>$grantid));
+	if (!$grant)
+	print_error('unknowngrant','mod_webctimport');
+	
+	if ($confirm && confirm_sesskey()) {
+		$DB->delete_records('webctgrant', array('id'=>$grant->id));
+		redirect($baseurl);
+	} else {
+		echo $OUTPUT->header();
+		$params = $urlparams;
+		$params['action'] = 'delete';
+		$params['grantid'] = $grantid;
+		$params['confirm'] = 1;
+		$params['sesskey'] = sesskey();
+		$confirmurl = new moodle_url($path, $params);
+		echo $OUTPUT->confirm(get_string('confirmdeletegrant', 'mod_webctimport', $grant), $confirmurl, $baseurl);
+		echo $OUTPUT->footer();
+		return;
+	}
+}
 
+echo $OUTPUT->header();
 
 // Carry on with the user listing
 
@@ -104,8 +197,8 @@ if (!$users) {
 } else {
 
 	$table = new html_table();
-	$table->head = array ($heading['firstname'],$heading['lastname'], $heading['username'], '');
-	$table->align = array ("left", "left", "left", "center");
+	$table->head = array ($heading['firstname'],$heading['lastname'], $heading['username'], '', get_string('extraaccess','mod_webctimport'));
+	$table->align = array ("left", "left", "left", "center", 'left');
 	$table->width = "95%";
 	foreach ($users as $user) {
 		if (isguestuser($user)) {
@@ -116,8 +209,21 @@ if (!$users) {
 		$params['userid'] = $user->id;
 		$addurl = new moodle_url($path, $params);
 		$addbutton = '<a href="'.$addurl.'"><img src="'.$OUTPUT->pix_url('t/add').'" alt="Add"/></a>';
+		// grants...
+		$grants = $DB->get_records('webctgrant',array('userid'=>$user->id),'title ASC');
+		$delbuttons = '';
+		foreach ($grants as $grant) {
+			if (!empty($delbuttons))
+				$delbuttons .= '<br>';
+			$delbuttons .= '<span>'.$grant->title.'</span>';
+			$params = $urlparams;
+			$params['action'] = 'delete';
+			$params['grantid'] = $grant->id;
+			$delurl = new moodle_url($path, $params);
+			$delbuttons .= '<a href="'.$delurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" alt="Delete"/></a>';
+		}
 		
-		$table->data[] = array ($user->firstname,$user->lastname,$user->username,$addbutton);
+		$table->data[] = array ($user->firstname,$user->lastname,$user->username,$addbutton,$delbuttons);
 	}
 }
 

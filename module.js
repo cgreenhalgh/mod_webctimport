@@ -6,18 +6,28 @@ init_treeview: function(Y, username, path) {
 		//alert('!2: '+username+', '+path);
 		var node = Y.one('#treeview_root');
 		Y.log('Found #toplist node...');
-		M.mod_webctimport.load_node(Y, node, path, '1');
+		M.mod_webctimport.load_node(Y, node, path, '1', 'get_listing.php');
 	});
 },
 
-load_node: function(Y, node, path, index) {
+//called by user.php (add)
+init_grant_treeview: function(Y) {
+	Y.use('io-base', 'node', 'json', function(Y) {
+		//alert('!2: '+username+', '+path);
+		var node = Y.one('#treeview_root');
+		Y.log('Found #toplist node...');
+		M.mod_webctimport.load_node(Y, node, '/', '1', 'get_context.php');
+	});
+},
+
+load_node: function(Y, node, path, index, get_listing) {
 	node.all('li').remove();
 	node.append('<li>Loading...</li>');
-	Y.io('get_listing.php?path='+encodeURIComponent(path), {
+	Y.io(get_listing+'?path='+encodeURIComponent(path), {
 		on: {
 		success: function(id, o, args) {
 		//alert('success: '+o.responseText);
-		M.mod_webctimport.build_tree(Y, node, o.responseText, index);
+		M.mod_webctimport.build_tree(Y, node, o.responseText, index, get_listing);
 	},
 	failure: function(id, o, args) {
 		//alert('failure: '+o+': '+o.statusText);
@@ -29,7 +39,7 @@ load_node: function(Y, node, path, index) {
 	});	
 },
 
-build_tree: function(Y, node, responseText, index) {
+build_tree: function(Y, node, responseText, index, get_listing) {
 	node.all('li').remove();
 	//node.append('<li>Debug - response: '+responseText+'</li>');
 	var json = Y.JSON.parse(responseText);
@@ -70,7 +80,7 @@ build_tree: function(Y, node, responseText, index) {
 		li = '<li><input type="checkbox" name="'+path+'"> '+item.title+li+'</li>';
 		node.append(li);
 		if (item.path!=undefined) {
-			M.mod_webctimport.add_subtree(Y, node, item, itemindex);
+			M.mod_webctimport.add_subtree(Y, node, item, itemindex, get_listing);
 		}
 	}
 },
@@ -80,19 +90,19 @@ encode: function(text) {
 	return text.replace(/[.]/g,'%2E');
 },
 
-add_subtree: function(Y, node, item, index) {
+add_subtree: function(Y, node, item, index, get_listing) {
 	var subtree = Y.Node.create('<ul><li><input type="button" value="+"/></li></ul>');
 	node.append(subtree);
 	var button = subtree.one('input');
 	//alert('button = '+button);
 	button.on('click', function() {
 		//alert('!3');
-		M.mod_webctimport.expand(Y, subtree, item.path, index);
+		M.mod_webctimport.expand(Y, subtree, item.path, index, get_listing);
 	});
 },
 
-expand : function(Y, ul, path, index) {
+expand : function(Y, ul, path, index, get_listing) {
 	//alert('expand '+path);
-	M.mod_webctimport.load_node(Y, ul, path, index);
+	M.mod_webctimport.load_node(Y, ul, path, index, get_listing);
 }
 }
