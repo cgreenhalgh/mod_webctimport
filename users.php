@@ -142,6 +142,23 @@ else if ($action=='delete') {
 
 echo $OUTPUT->header();
 
+// filter...
+echo '<div>';
+echo '<form action="users.php" method="POST">';
+echo '<input type="hidden" name="sort" value="'.$sort.'">';
+echo '<input type="hidden" name="dir" value="'.$dir.'">';
+echo '<input type="hidden" name="page" value="'.$page.'">';
+echo '<input type="hidden" name="perpage" value="'.$perpage.'">';
+echo '<input type="hidden" name="userid" value="'.$userid.'">';
+echo get_string('filterprompt','mod_webctimport').'<input type="text" name="filter" value="'.$filter.'">';
+echo '<input type="submit" value="'.get_string('filter','mod_webctimport').'">';
+echo '</form>';
+echo '</div>';
+
+$params = $urlparams;
+unset($params['filter']);
+echo $OUTPUT->single_button(new moodle_url($path,$params), get_string('clearfilter','mod_webctimport'));
+
 // Carry on with the user listing
 
 $columns = array("firstname", "lastname", "username");
@@ -165,11 +182,17 @@ foreach ($columns as $column) {
 	$heading[$column] = '<a href="'.$url.'">'.$string[$column].'</a>'.$columnicon;
 }
 
-$extrasql = null;
-$params = array(); //$ufiltering->get_sql_filter();
-$users = get_users_listing($sort, $dir, $page*$perpage, $perpage, '', '', '', $extrasql, $params);
+$search = null;
+if (!empty($filter)) {
+	$search = $filter;
+}
+// Note: $page*$perpage is correct, in spite of appearances
+// need to exclude guest user(s) explicitly only from get_users_listing (moodle 2.1)
+$extrasql = "id <> :guestid2";
+$extraparams = array('guestid2'=>$CFG->siteguest);
+$users = get_users_listing($sort, $dir, $page*$perpage, $perpage, $search, '', '', $extrasql, $extraparams);
 $usercount = get_users(false);
-$usersearchcount = get_users(false, '', true, null, "", '', '', '', '', '*', $extrasql, $params);
+$usersearchcount = get_users(false, $search, true, null, "", '', '', '', '', '*', '', array());
 
 if ($extrasql !== '') {
 	echo $OUTPUT->heading("$usersearchcount / $usercount ".get_string('users'));
@@ -202,6 +225,7 @@ if (!$users) {
 	$table->width = "95%";
 	foreach ($users as $user) {
 		if (isguestuser($user)) {
+			debugging('ignoring guest user '.$user->username.', id='.$user-id.' (siteguest='.$CFG->siteguest.')');
 			continue; // do not display guest here
 		}
 		$params = $urlparams;
@@ -222,9 +246,10 @@ if (!$users) {
 			$delurl = new moodle_url($path, $params);
 			$delbuttons .= '<a href="'.$delurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" alt="Delete"/></a>';
 		}
-		
+		debugging('add user $user->username');
 		$table->data[] = array ($user->firstname,$user->lastname,$user->username,$addbutton,$delbuttons);
 	}
+	debugging("Showing page $page with $perpage per page gave ".count($users)." users -> ".count($table->data)." rows");
 }
 
 if (!empty($table)) {

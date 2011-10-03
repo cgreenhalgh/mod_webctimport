@@ -48,6 +48,7 @@ CHANGES
 - 2011-10-11: added capability to grant access to modules to other users, via 
   (site manager) admin form mod/webctimport/users.php.
   Tidied up treeview a little.
+  Added search/filter to users view and fixed paging (filtering out guest user).
 
 - 2011-10-10: add resource redirects to webctimport index, which attempts to import 
   resources one by one. 
