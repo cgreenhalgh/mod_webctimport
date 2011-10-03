@@ -45,7 +45,7 @@ echo $OUTPUT->header();
 	echo '<input type="hidden" name="section" value="'.$mod->section.'">';
 	// sessKey? modulename? instance?
 ?>
-<ul id="treeview_root">
+<ul class="mod_webctimport_list" id="treeview_root">
 	<li>...</li>
 </ul>
 <input type="submit" value="Add selected items">

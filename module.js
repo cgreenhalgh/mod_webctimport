@@ -77,7 +77,7 @@ build_tree: function(Y, node, responseText, index, get_listing) {
 			path = path+'&description='+M.mod_webctimport.encode(item.description);
 			li = li+'<br>'+item.description;
 		}
-		li = '<li><input type="checkbox" name="'+path+'"> '+item.title+li+'</li>';
+		li = '<li class="mod_webctimport_item"><input class="mod_webctimport_checkbox" type="checkbox" name="'+path+'"> '+item.title+li+'</li>';
 		node.append(li);
 		if (item.path!=undefined) {
 			M.mod_webctimport.add_subtree(Y, node, item, itemindex, get_listing);
@@ -91,7 +91,7 @@ encode: function(text) {
 },
 
 add_subtree: function(Y, node, item, index, get_listing) {
-	var subtree = Y.Node.create('<ul><li><input type="button" value="+"/></li></ul>');
+	var subtree = Y.Node.create('<ul class="mod_webctimport_list"><li class="mod_webctimport_item"><input class="mod_webctimport_expand" type="button" value="+"/></li></ul>');
 	node.append(subtree);
 	var button = subtree.one('input');
 	//alert('button = '+button);
