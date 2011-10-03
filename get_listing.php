@@ -37,10 +37,57 @@ if ($path=='/' || strlen($path)==0) {
 $jsontext = file_get_contents($rootfolderpath.$path.'get_listing.json');
 if ($jsontext==false) {
 	debugging('Not found: get_listing from '.$rootfolderpath.' '.$path);
-	if ($toplevel)
-		echo '{"error":"This user does not have any files from WebCT"}';
-	else
+	if (!$toplevel) {
 		echo '{"error":"File not found"}';
+//		echo '{"error":"This user does not have any files from WebCT"}';
+		return;
+	}
+}
+if ($toplevel) {
+	$grants = $DB->get_records('webctgrant',array('userid'=>$USER->id));
+	if (count($grants)==0) {
+		if ($jsontext==false) {
+			echo '{"error":"This user does not have any files from WebCT"}';
+			return;
+		}
+		else {
+			echo $jsontext;
+			return;
+		}
+	}
+	try {
+		if ($jsontext==false) {
+			// synthentic get_listing...
+			$json = new stdClass();
+			$json->path = array();
+			$pathel = new stdClass();
+			$pathel->name = 'WebCT/grant ('.$USER->username.')';
+			$pathel->path = '/';
+			$json->path[] = $pathel;
+			$json->nologin = true;
+			$json->list = array();			
+		}
+		else
+			$json = json_decode($jsontext);
+		
+		foreach ($grants as $grant) {
+			$item = new stdClass();
+			$item->title = $grant->title.' (granted access)';
+			$item->description = $grant->description;
+			$item->webcttype = $grant->webcttype;
+			$item->size = 0;
+			$item->children = array();
+			$item->path = $grant->path;
+			$json->list[] = $item;
+		}
+		
+		echo json_encode($json);
+		return;
+	}
+	catch (Exception $e) {
+		debugging('get_listing, extra grants: '.$e->getMessage());
+		echo $jsontext;
+	}
 }
 else {
 	//debugging('get_listing from '.$rootfolderpath.$path.' -> '.$jsontext);
