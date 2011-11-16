@@ -69,8 +69,17 @@ build_tree: function(Y, node, responseText, index, get_listing) {
 			li = li+' <a href="'+item.source+'"'+linkextra+'>'+item.source+'</a>';
 		} 
 		else {
-			// file
-			path = path+'&type=f&path='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
+			if (item.webcttype=='PAGE_TYPE/Default')
+				// html page
+				path = path+'&type=h';
+			else
+				// file
+				path = path+'&type=f';
+			path = path+'&path='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
+			if (item.htmlwarnlevel!=undefined) {
+				path = path+'&htmlwarnlevel='+M.mod_webctimport.encode(item.htmlwarnlevel);
+				//li = li+' [htmlwarnlevel='+item.htmlwarnlevel+']';
+			}
 			if (item.lastmodifiedts!=undefined)
 				linkextra = linkextra+' title="Last modified: '+new Date(item.lastmodifiedts).toLocaleString()+'"';
 			li = li+' <a href="read_file.php?path='+encodeURIComponent(item.source)+'"'+linkextra+'>Preview file</a>';

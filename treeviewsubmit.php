@@ -29,6 +29,7 @@ $config = get_config('webctimport');
 $webctimportmoduleid = $DB->get_record('modules', array('name'=>'webctimport'), '*', MUST_EXIST)->id;
 $urlmoduleid = $DB->get_record('modules', array('name'=>'url'), '*', MUST_EXIST)->id;
 $labelmoduleid = $DB->get_record('modules', array('name'=>'label'), '*', MUST_EXIST)->id;
+$pagemoduleid = $DB->get_record('modules', array('name'=>'page'), '*', MUST_EXIST)->id;
 
 
 //debugging('treeviewsubmit.php (3)...');
@@ -111,6 +112,12 @@ foreach ($indexes as $index) {
 		global $USER;
 	    $mod->module = $webctimportmoduleid;
 		$mod->name = $item['title'];
+		if (isset($item['htmlwarnlevel'])) {
+			if ($item['htmlwarnlevel']==WEBCTIMPORT_HTML_WARN_HIGH)
+				$mod->name .= ' (NB: Broken Links)';
+			else if ($item['htmlwarnlevel']==WEBCTIMPORT_HTML_WARN_MED)
+				$mod->name .= ' (NB: Check Links)';
+		}
 		if (isset($item['description'])) {
 			$mod->intro .= '<br>'.$item['description'];
 		} else
@@ -136,6 +143,62 @@ foreach ($indexes as $index) {
 		
 		$return = webctimport_add_instance($mod, null);
 	}
+	else if ($type=='h') {
+		// HTML -> Page - fix me
+		global $USER;
+	    $mod->module = $pagemoduleid;
+		$mod->name = $item['title'];
+		if (isset($item['htmlwarnlevel'])) {
+			if ($item['htmlwarnlevel']==WEBCTIMPORT_HTML_WARN_HIGH)
+				$mod->name .= ' (NB: Broken Links)';
+			else if ($item['htmlwarnlevel']==WEBCTIMPORT_HTML_WARN_MED)
+				$mod->name .= ' (NB: Check Links)';
+		}
+		if (isset($item['description'])) {
+			$mod->intro .= '<br>'.$item['description'];
+		} else
+			$mod->intro = null;
+		$mod->modulename = 'webctimport';
+		
+		// defaults
+		$mod->display = $config->display;
+		// display options
+		//$mod->popupwidth = $config->popupwidth;
+		//$mod->popupheight = $config->popupwidth;
+		//$mod->printheading = $config->printheading;
+		//$mod->printintro = $config->printintro;
+
+		$displayoptions = array();
+		if ($mod->display == RESOURCELIB_DISPLAY_POPUP) {
+			$displayoptions['popupwidth']  = $config->popupwidth;
+			$displayoptions['popupheight'] = $config->popupheight;
+		}
+		$displayoptions['printheading'] = $config->printheading;
+		$displayoptions['printintro']   = $config->printintro;
+		$mod->displayoptions = serialize($displayoptions);
+		
+		//    $data->content       = $data->page['text'];
+		$fileinfo = webctimport_get_file_info($item['path']);
+		if (!$fileinfo || !isset($fileinfo->path)) {
+			print_error('errorfindinghtmlcontent', 'mod_webctimport');
+		}
+		$path = webctimport_get_file_content_path($fileinfo->path);		
+		try {
+			$mod->content = file_get_contents($path);
+		}
+		catch (Exception $e) {
+			debugging('reading '.$path.': '.$e);
+			print_error('errorreadinghtmlcontent', 'mod_webctimport');
+		}
+    	//    $data->contentformat = $data->page['format'];
+    	$mod->contentformat = FORMAT_HTML;
+		// we don't want to use page_add_instance because it is not consistent with url_add_instance etc.
+		// e.g. needs coursemodule in advance
+		//$return = page_add_instance($mod, null);
+    	$mod->timemodified = time();
+
+    	$return = $mod->id = $DB->insert_record('page', $mod);
+	}
 	else {
  		debugging('unknown treeview type: '.$type.' - ignored!');
 	}
@@ -144,15 +207,15 @@ foreach ($indexes as $index) {
 		// course_modules and course_sections each contain a reference
 		// to each other, so we have to update one of them twice.
 		if (! $mod->coursemodule = add_course_module($mod) ) {
-			error("Could not add a new course module");
+			print_error('erroraddingcoursemodule', 'mod_webctimport');
 		}
 
 		if (! $sectionid = add_mod_to_section($mod) ) {
-			error("Could not add the new course module to that section");
+			print_error('erroraddingtosection', 'mod_webctimport');
 		}
 
 		if (! $DB->set_field("course_modules", "section", $sectionid, array("id" => $mod->coursemodule))) {
-			error("Could not update the course module with the correct section");
+			print_error('errorupdatingcoursemodule', 'mod_webctimport');
 		}
 		set_coursemodule_visible($mod->coursemodule, true);
 	}

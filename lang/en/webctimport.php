@@ -23,7 +23,6 @@
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}, 2011 The University of Nottingham (Chris Greenhalgh)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 $string['clicktopreview'] = 'Click {$a} to preview file.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
@@ -46,6 +45,11 @@ $string['displayselect_help'] = 'This setting, together with the item file type 
 * In frame - The item is displayed within a frame below the the navigation bar and URL description
 * New window - The item is displayed in a new browser window with menus and an address bar';
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all URLs.';
+$string['erroraddingcoursemodule'] = 'Sorry - could not add a new course module';
+$string['erroraddingtosection'] = 'Sorry - could not add the new course module to that section';
+$string['errorfindinghtmlcontent'] = 'Sorry - could not find HTML page content in cache';
+$string['errorreadinghtmlcontent'] = 'Sorry - could not read HTML page content from cache';
+$string['errorupdatingcoursemodule'] = 'Sorry - could not update the course module with the correct section';
 $string['externalurl'] = 'External URL';
 $string['extraaccess'] = 'Granted access to';
 $string['filterprompt'] = 'Name or username:';

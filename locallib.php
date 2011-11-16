@@ -317,6 +317,7 @@ function webctimport_get_item_extra_info($item) {
 				$item->mimetype = $fileinfo->mimetype;
 				$warn_level = webctimport_get_html_warn_level($fileinfo);
 				if ($warn_level!=WEBCTIMPORT_HTML_WARN_NONE) {
+					$item->htmlwarnlevel = $warn_level;
 					// TODO more careful check?
 					if ($warn_level==WEBCTIMPORT_HTML_WARN_LOW) {
 						$item->warninghtml = '<img src="'.$OUTPUT->pix_url('i/warn_low','webctimport').'" class="activityicon" title="Does not appear to contain links"/>';

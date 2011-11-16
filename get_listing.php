@@ -89,5 +89,11 @@ if ($toplevel) {
 foreach ($json->list as $item) {
 	webctimport_get_item_extra_info($item);
 }
+// files area to end?
+if (count($json->list)>1 && $json->list[0]->webcttype=='Template/Default') {
+	$files = $json->list[0];
+	unset($json->list[0]);
+	$json->list[] = $files;	
+}
 
 echo json_encode($json);
