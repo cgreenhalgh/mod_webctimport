@@ -10,6 +10,7 @@ require_login();
 
 $path = required_param('path', PARAM_PATH); // directory path
 $filename = required_param('filename', PARAM_FILE); // filename
+$mimetype = optional_param('mimetype', '', PARAM_TEXT); // mimetype
 
 try {
 	// will check path etc.
@@ -25,5 +26,5 @@ try {
 //	$filename = $path;
 
 //debugging('get_file '.$path);
-
-send_file($path, urldecode($filename));
+//send_file($path, $filename, $lifetime = 'default' , $filter=0, $pathisstring=false, $forcedownload=false, $mimetype='')
+send_file($path, urldecode($filename), 'default', 0, false, false, $mimetype);

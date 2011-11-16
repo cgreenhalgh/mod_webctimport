@@ -19,9 +19,16 @@ try {
 	
 $rawpath = $info->path;
 $filename = $info->filename;
+$mimetype = '';
+if ($info->webcttype=='PAGE_TYPE/Default')
+	$mimetype = '&mimetype='.urlencode('text/html');
+else if (isset($info->mimetype))
+	$mimetype = '&mimetype='.urlencode($info->mimetype);
+
+
 if (empty($rawpath)) {
 	print_error('cannot find path in file information: '.$path);
 	return;
 }
 //debugging('get_file redirects to '.$path.' -> '.$rawpath.' (filename '.$filename.')');
-redirect($CFG->wwwroot.'/mod/webctimport/read_rawfile.php?path='.urlencode($rawpath).'&filename='.urlencode($filename));
+redirect($CFG->wwwroot.'/mod/webctimport/read_rawfile.php?path='.urlencode($rawpath).'&filename='.urlencode($filename).$mimetype);

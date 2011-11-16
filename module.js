@@ -81,7 +81,10 @@ build_tree: function(Y, node, responseText, index, get_listing) {
 		}
 		var icon = '<img src="'+item.iconurl+'"  class="activityicon"/>';
 		var debug = '';//' ('+item.webcttype+')';
-		li = '<li class="mod_webctimport_item">'+icon+'.<input class="mod_webctimport_checkbox" type="checkbox" name="'+path+'"> '+item.title+debug+li+'</li>';
+		var warninghtml = '';
+		if (item.warninghtml!=undefined)
+			warninghtml = item.warninghtml;
+		li = '<li class="mod_webctimport_item">'+icon+'<input class="mod_webctimport_checkbox" type="checkbox" name="'+path+'"> '+item.title+warninghtml+debug+li+'</li>';
 		var n = Y.Node.create(li);
 		node.append(n);
 		if (item.path!=undefined) {

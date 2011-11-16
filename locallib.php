@@ -284,7 +284,23 @@ function webctimport_get_iconurl($item) {
 	else if (!empty($item->path))
 		return ''.$OUTPUT->pix_url('i/closed');
 	else
-		return ''.$OUTPUT->pix_url('f/unknown');
+		return ''.$OUTPUT->pix_url('f/anyfile','webctimport');
+}
+
+function webctimport_get_html_warn_level($fileinfo) {
+	if ($fileinfo->webcttype=='PAGE_TYPE/Default' || $fileinfo->webcttype=='ContentFile/HTML') {
+		// TODO more careful check?
+		if (!isset($fileinfo->hrefs) || count($fileinfo->hrefs)==0) {
+			return WEBCTIMPORT_HTML_WARN_LOW;
+		}
+		else if (isset($fileinfo->hasrelativerefs) && $fileinfo->hasrelativerefs) {
+			return WEBCTIMPORT_HTML_WARN_HIGH;
+		}
+		else  {
+			return WEBCTIMPORT_HTML_WARN_MED;
+		}
+	}
+	return WEBCTIMPORT_HTML_WARN_NONE;
 }
 
 /**
@@ -292,14 +308,32 @@ function webctimport_get_iconurl($item) {
  * @param stdClass $item get_listing item
  */
 function webctimport_get_item_extra_info($item) {
+	global $OUTPUT;
 	if (isset($item->source) && $item->webcttype!='URL_TYPE/Default') {
 		try {
 			$fileinfo = webctimport_get_file_info($item->source);
 			if (!empty($fileinfo)) {
 				$item->lastmodifiedts = $fileinfo->lastmodifiedts;
 				$item->mimetype = $fileinfo->mimetype;
+				$warn_level = webctimport_get_html_warn_level($fileinfo);
+				if ($warn_level!=WEBCTIMPORT_HTML_WARN_NONE) {
+					// TODO more careful check?
+					if ($warn_level==WEBCTIMPORT_HTML_WARN_LOW) {
+						$item->warninghtml = '<img src="'.$OUTPUT->pix_url('i/warn_low','webctimport').'" class="activityicon" title="Does not appear to contain links"/>';
+					}
+					else if ($warn_level==WEBCTIMPORT_HTML_WARN_HIGH) {
+						$item->warninghtml = '<img src="'.$OUTPUT->pix_url('i/warn_high','webctimport').'" class="activityicon" title="Probably contains broken links"/>';
+					}
+					else  {
+						$item->warninghtml = '<img src="'.$OUTPUT->pix_url('i/warn_med','webctimport').'" class="activityicon" title="May contain broken links"/>';
+					}
+					// hasrelativerefs, hrefs, hasnocontent
+//					if (isset($fileinfo->hrefs) && $fileinfo->hrefs)
+//						$item->warninghtml .= json_encode($fileinfo->hrefs);
+				}
 			}
 		} catch (Exception $e) { /*ignore */ }
 	}
 	$item->iconurl = webctimport_get_iconurl($item);
 }
+

@@ -38,6 +38,11 @@ define('WEBCTIMPORT_STATUS_DONE', 2);
 define('WEBCTIMPORT_STATUS_TRANSIENT_ERROR', 3);
 define('WEBCTIMPORT_STATUS_PERMANENT_ERROR', 4);
 
+define('WEBCTIMPORT_HTML_WARN_NONE', 0);
+define('WEBCTIMPORT_HTML_WARN_LOW', 1);
+define('WEBCTIMPORT_HTML_WARN_MED', 2);
+define('WEBCTIMPORT_HTML_WARN_HIGH', 3);
+
 /**
  * List of features supported in URL module
  * @param string $feature FEATURE_xx constant for requested feature
