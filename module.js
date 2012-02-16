@@ -64,6 +64,9 @@ build_tree: function(Y, node, responseText, index, get_listing) {
 		if (item.path!=undefined) {
 			path = path+'&type=l&path='+M.mod_webctimport.encode(item.path)+'&title='+M.mod_webctimport.encode(item.title);
 		}
+		else if (item.webcttype=='HEADING_TYPE/Default') {
+			path = path+'&type=l&title='+M.mod_webctimport.encode(item.title);
+		} 
 		else if (item.webcttype=='URL_TYPE/Default') {
 			path = path+'&type=u&url='+M.mod_webctimport.encode(item.source)+'&title='+M.mod_webctimport.encode(item.title);
 			li = li+' <a href="'+item.source+'"'+linkextra+'>'+item.source+'</a>';

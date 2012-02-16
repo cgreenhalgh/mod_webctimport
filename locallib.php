@@ -278,6 +278,8 @@ function webctimport_get_iconurl($item) {
 	// TODO more complete choice of icon?
 	if ($item->webcttype=='URL_TYPE/Default')
 		return ''.$OUTPUT->pix_url('f/web');
+	if ($item->webcttype=='HEADING_TYPE/Default')
+		return ''.$OUTPUT->pix_url('i/edit');
 	if ($item->webcttype=='PAGE_TYPE/Default')
 		//$item->webcttype=='ContentFile/HTML' || 
 		return ''.$OUTPUT->pix_url('f/html');
