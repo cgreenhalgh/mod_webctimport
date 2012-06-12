@@ -108,9 +108,17 @@ while (true) {
 							'filename'=>$fileinfo->filename,
 							'mimetype'=>$fileinfo->mimetype,
 							'filepath'=>'/',
-							'timemodified'=>($fileinfo->lastmodifiedts/1000),
+							//Error in 2.2: 'timemodified'=>($fileinfo->lastmodifiedts/1000),
 							'author'=>'webct:'.$USER->username,
 			);
+			if (isset($fileinfo->lastmodifiedts)) {
+				// moodle 2.2. is fussy about this being an int (not, for example, a double)
+				$file_record['timemodified'] = intval($fileinfo->lastmodifiedts/1000);
+				//debugging('timemodified = '.$file_record['timemodified'].' (from '.$fileinfo->lastmodifiedts.')');
+			}
+			else {
+				debugging('No (valid) lastmodifiedts for '.$file->localfilepath);
+			}
 			$fs->create_file_from_pathname($file_record, webctimport_get_file_content_path($fileinfo->path));
 
 			require_once("$CFG->dirroot/mod/resource/locallib.php");
